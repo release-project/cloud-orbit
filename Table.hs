@@ -1,7 +1,10 @@
 --
 -- orbit-int hash table (storing vertices on a worker)
 --
-module Table( new
+module Table( Freq
+            , VTable
+            , Vertex
+            , new
             , to_list
             , is_member
             , insert
@@ -21,7 +24,8 @@ module Table( new
 import Data.Array (Array, elems, listArray, (!), (//))
 
 type Freq = [Int]
-type VTable = Array Int [Int]
+type Vertex = Int
+type VTable = Array Int [Vertex]
 
 -- Note: Hash tables have a fixed number of slots but each slot can store
 -- a list of vertices. The functions is_member/3 and insert/3
@@ -32,15 +36,15 @@ new :: Int -> VTable
 new size = listArray (0, size - 1) $ cycle [[]]
 
 -- to_list(T) converts a table T into a list of its entries.
-to_list :: VTable -> [Int]
+to_list :: VTable -> [Vertex]
 to_list = concat . elems
 
 -- is_member(X, I, T) is true iff X is stored in table T at slot I.
-is_member :: Int -> Int -> VTable -> Bool
+is_member :: Vertex -> Int -> VTable -> Bool
 is_member x i t = elem x (t ! i)
 
 -- insert(X, I, T) inserts X into table T at slot I.
-insert :: Int -> Int -> VTable -> VTable
+insert :: Vertex -> Int -> VTable -> VTable
 insert x i t = t // [(i, x : t ! i)]
 
 -- get_freq computes the fill frequency of table T;
