@@ -14,8 +14,8 @@ module Table( new
             , max_freq
             , avg_freq
             , avg_nonempty_freq
-            --, freq_to_stat
-            --, freq_from_stat
+            , freq_to_stat
+            , freq_from_stat
             , fill_deg) where
 
 import Data.Array (Array, elems, listArray, (!), (//))
@@ -95,28 +95,28 @@ sum_freqs2 (n : f) (m : sumF) = n + m : sum_freqs2 f sumF
 sum_freqs :: [Freq] -> Freq
 sum_freqs fs = foldl (flip sum_freqs2) [] fs
 
-{- XXX: Fix below functions to type-check!
 -- freq_to_stat produces a readable statistics from a table fill frequency;
 -- the input frequency F is itself part of the statistics
-freq_to_stat :: Freq -> [(String, a)]
-freq_to_stat frequency = [ --("freq", frequency)
-                           ("size", freq_to_vertices frequency)
-                         , ("slots", freq_to_slots frequency)
-                         , ("nonempty_slots", freq_to_nonempty_slots frequency)
-                         , ("fill_deg", fill_deg frequency)
-                         , ("max_freq", max_freq frequency)
-                         , ("avg_freq", avg_freq frequency)
-                         , ("nonempty_avg_freq", avg_nonempty_freq frequency)
+freq_to_stat :: Freq -> [(String, String)]
+freq_to_stat frequency = [ ("freq", show frequency)
+                         , ("size", show $ freq_to_vertices frequency)
+                         , ("slots", show $ freq_to_slots frequency)
+                         , ("nonempty_slots",
+                            show $ freq_to_nonempty_slots frequency)
+                         , ("fill_deg", show $ fill_deg frequency)
+                         , ("max_freq", show $ max_freq frequency)
+                         , ("avg_freq", show $ avg_freq frequency)
+                         , ("nonempty_avg_freq",
+                            show $ avg_nonempty_freq frequency)
                          ]
 
 -- freq_from_stat extracts a table fill frequency from a statistics Stat
 -- (assuming Stat was produced by freq_to_stat/1, otherwise returns []);
-freq_from_stat :: [(String, a)] -> Freq
+freq_from_stat :: [(String, String)] -> Freq
 freq_from_stat stat =
   case "freq" `lookup` stat of
-    Just val -> val
+    Just val -> read val :: [Int]
     Nothing -> []
--}
 
 --------------------------------------------------------------------------------
 -- auxiliary functions
