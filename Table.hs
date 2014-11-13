@@ -76,22 +76,22 @@ avg_freq f = (fi $ freq_to_vertices f) / (fi $ freq_to_slots f)
 -- avg_nonempty_freq returns the average fill frequency of non empty slots.
 avg_nonempty_freq :: Freq -> Float
 avg_nonempty_freq f =
-  case freq_to_vertices f of
-    verts | verts > 0 -> (fi verts) / (fi $ freq_to_nonempty_slots f)
-    otherwise         -> 0.0
+    if verts > 0 then (fi verts) / (fi $ freq_to_nonempty_slots f)
+    else 0.0
+  where verts = freq_to_vertices f
 
 -- fill_deg determines the filling degree of the table.
 fill_deg :: Freq -> Float
 fill_deg f = (fi $ freq_to_nonempty_slots f) / (fi $ freq_to_slots f)
 
 -- sum_freqs/2 sums two fill frequencies.
-sum_freqs2 :: Freq -> Freq -> [Int]
+sum_freqs2 :: Freq -> Freq -> Freq
 sum_freqs2 [] sumF = sumF
 sum_freqs2 f [] = f
 sum_freqs2 (n : f) (m : sumF) = n + m : sum_freqs2 f sumF
 
 -- sum_freqs/1 sums a list of fill frequencies.
-sum_freqs :: [Freq] -> [Int]
+sum_freqs :: [Freq] -> Freq
 sum_freqs fs = foldl (flip sum_freqs2) [] fs
 
 {- XXX: Fix below functions to type-check!
