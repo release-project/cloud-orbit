@@ -21,32 +21,33 @@ module Table( new
 import Data.Array (Array, elems, listArray, (!), (//))
 
 type Freq = [Int]
+type VTable = Array Int [Int]
 
 -- Note: Hash tables have a fixed number of slots but each slot can store
 -- a list of vertices. The functions is_member/3 and insert/3
 -- expect its slot argument to be in range.
 
 -- new(Size) creates a table with Size slots, each containing an empty list.
-new :: Int -> Array Int [Int]
+new :: Int -> VTable
 new size = listArray (0, size - 1) $ cycle [[]]
 
 -- to_list(T) converts a table T into a list of its entries.
-to_list :: Array Int [Int] -> [Int]
+to_list :: VTable -> [Int]
 to_list = concat . elems
 
 -- is_member(X, I, T) is true iff X is stored in table T at slot I.
-is_member :: Int -> Int -> Array Int [Int] -> Bool
+is_member :: Int -> Int -> VTable -> Bool
 is_member x i t = elem x (t ! i)
 
 -- insert(X, I, T) inserts X into table T at slot I.
-insert :: Int -> Int -> Array Int [Int] -> Array Int [Int]
+insert :: Int -> Int -> VTable -> VTable
 insert x i t = t // [(i, x : t ! i)]
 
 -- get_freq computes the fill frequency of table T;
 -- the output is a list of integers where the number at position I
 -- indicates how many slots of T are filled with I entries;
 -- the sum of the output lists equals the number of slots of T.
-get_freq :: Array Int [Int] -> Freq
+get_freq :: VTable -> Freq
 get_freq t = elems $ foldl (flip inc) freqArr freqs
   where freqs = map length $ elems t
         maxFreq = foldl max (head freqs) (tail freqs)
