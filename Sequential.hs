@@ -6,7 +6,7 @@ module Sequential(orbit) where
 import Table (Freq, VTable, Vertex, get_freq, freq_to_stat, is_member, insert, new, to_list)
 import Data.Hashable (hash)
 import Data.Dequeue (BankersDequeue, fromList, popFront, pushBack)
-import Master (now)
+import OrbitUtils (now)
 
 type Conf = ([Vertex -> Vertex], Int)
 
