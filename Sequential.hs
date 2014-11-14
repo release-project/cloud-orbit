@@ -27,12 +27,11 @@ import WorkerAux
 import Types
   ( Generator
   , Freq
+  , SeqConf
   , Stats
   , Vertex
   , VTable
   )
-
-type Conf = ([Generator], Int)
 
 -- DATA
 --   Static Machine Configuration:
@@ -70,7 +69,7 @@ orbit gs xs tableSize = (orbit, [stat])
 -- Table          -- hash table holding vertices
 -- Queue          -- work queue
 -- VertsRecvd     -- number of vertices removed from the Queue so far
-vertex_server :: Conf -> VTable -> BankersDequeue Vertex -> Int -> (VTable, Int)
+vertex_server :: SeqConf -> VTable -> BankersDequeue Vertex -> Int -> (VTable, Int)
 vertex_server staticMachConf table queue vertsRecvd =
   case popFront queue of
     (Nothing, _)     -> (table, vertsRecvd)
@@ -80,7 +79,7 @@ vertex_server staticMachConf table queue vertsRecvd =
 -- handle_vertex checks whether vertex X is stored in Table;
 -- if not, it is in inserted and the images of the generators
 -- are pushed into the work queue.
-handle_vertex :: Conf -> Vertex -> VTable -> BankersDequeue Vertex -> (VTable, BankersDequeue Vertex)
+handle_vertex :: SeqConf -> Vertex -> VTable -> BankersDequeue Vertex -> (VTable, BankersDequeue Vertex)
 handle_vertex staticMachConf x table queue =
   case is_member x slot table of                -- check whether X is already in Table
     -- X already in table; do nothing
@@ -95,7 +94,7 @@ handle_vertex staticMachConf x table queue =
 
 
 -- hash_vertex computes the hash table slot of vertex X
-hash_vertex :: Conf -> Vertex -> Int
+hash_vertex :: SeqConf -> Vertex -> Int
 hash_vertex staticMachConf x =
   hsh `rem` tableSize
   where tableSize = get_table_size staticMachConf
@@ -105,13 +104,13 @@ hash_vertex staticMachConf x =
 -- auxiliary functions
 
 -- functions operating on the StaticMachConf
-mk_static_mach_conf :: [Generator] -> Int -> Conf
+mk_static_mach_conf :: [Generator] -> Int -> SeqConf
 mk_static_mach_conf gs tableSize = (gs, tableSize)
 
-get_gens :: Conf -> [Generator]
+get_gens :: SeqConf -> [Generator]
 get_gens staticMachConf = fst staticMachConf
 
-get_table_size :: Conf -> Int
+get_table_size :: SeqConf -> Int
 get_table_size staticMachConf = snd staticMachConf
 
 -- produce readable statistics

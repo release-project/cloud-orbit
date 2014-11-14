@@ -6,6 +6,8 @@ module Types ( Ct(..)
              , Freq
              , Host
              , MaybeHosts(..)
+             , ParConf
+             , SeqConf
              , Stats
              , Vertex
              , VTable) where
@@ -15,6 +17,7 @@ import Data.Array
   )
 import Control.Distributed.Process
   ( NodeId
+  , ProcessId
   )
 
 type Freq   = [Int]
@@ -25,6 +28,8 @@ type Generator = Vertex -> Vertex
 type Host = (NodeId, Int, Int, Int) -- Node, Procs, TableSize, IdleTimeout
 data MaybeHosts = Seq Int
                 | Par [Host]
+type SeqConf = ([Generator], Int)
+type ParConf = ([Generator], ProcessId, [ProcessId], Int, Int, Bool)
 
 -- counters/timers record
 data Ct = Ct {
