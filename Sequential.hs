@@ -3,7 +3,7 @@
 --
 module Sequential(orbit) where
 
-import Table (Freq, VTable, Vertex, get_freq, freq_to_stat, is_member, insert, new, to_list)
+import Table (Freq, Stats, VTable, Vertex, get_freq, freq_to_stat, is_member, insert, new, to_list)
 import Data.Hashable (hash)
 import Data.Dequeue (BankersDequeue, fromList, popFront, pushBack)
 import OrbitUtils (now)
@@ -24,7 +24,7 @@ type Conf = ([Vertex -> Vertex], Int)
 -- where the hash table is of size TableSize.
 -- The function returns a pair consisting of the computed orbit and a singleton
 -- list of statistics (mainly runtime and fill degree of the table).
-orbit :: [Vertex -> Vertex] -> [Vertex] -> Int -> ([Vertex],  [[(String, String)]])
+orbit :: [Vertex -> Vertex] -> [Vertex] -> Int -> ([Vertex],  [Stats])
 orbit gs xs tableSize = (orbit, [stat])
         -- assemble static configuration
   where staticMachConf = mk_static_mach_conf gs tableSize  
@@ -91,7 +91,7 @@ get_table_size :: Conf -> Int
 get_table_size staticMachConf = snd staticMachConf
 
 -- produce readable statistics
-seq_stats :: Int -> Freq -> Int -> [(String, String)]
+seq_stats :: Int -> Freq -> Int -> Stats
 seq_stats elapsedTime frequency vertsRecvd =
   ("wall_time", show elapsedTime) : ("vertices_recvd", show vertsRecvd) : freq_to_stat frequency
 

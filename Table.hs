@@ -2,6 +2,7 @@
 -- orbit-int hash table (storing vertices on a worker)
 --
 module Table( Freq
+            , Stats
             , VTable
             , Vertex
             , new
@@ -23,9 +24,10 @@ module Table( Freq
 
 import Data.Array (Array, elems, listArray, (!), (//))
 
-type Freq = [Int]
+type Freq   = [Int]
 type Vertex = Int
 type VTable = Array Int [Vertex]
+type Stats  = [(String, String)]
 
 -- Note: Hash tables have a fixed number of slots but each slot can store
 -- a list of vertices. The functions is_member/3 and insert/3
@@ -101,7 +103,7 @@ sum_freqs fs = foldl (flip sum_freqs2) [] fs
 
 -- freq_to_stat produces a readable statistics from a table fill frequency;
 -- the input frequency F is itself part of the statistics
-freq_to_stat :: Freq -> [(String, String)]
+freq_to_stat :: Freq -> Stats
 freq_to_stat frequency = [ ("freq", show frequency)
                          , ("size", show $ freq_to_vertices frequency)
                          , ("slots", show $ freq_to_slots frequency)
@@ -116,7 +118,7 @@ freq_to_stat frequency = [ ("freq", show frequency)
 
 -- freq_from_stat extracts a table fill frequency from a statistics Stat
 -- (assuming Stat was produced by freq_to_stat/1, otherwise returns []);
-freq_from_stat :: [(String, String)] -> Freq
+freq_from_stat :: Stats -> Freq
 freq_from_stat stat =
   case "freq" `lookup` stat of
     Just val -> read val :: [Int]
