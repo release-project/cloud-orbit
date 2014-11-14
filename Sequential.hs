@@ -4,12 +4,32 @@
 module Sequential(Generator
                 , orbit) where
 
-import Table (Freq, Stats, VTable, Vertex, get_freq, freq_to_stat, is_member, insert, new, to_list)
-import Data.Hashable (hash)
-import Data.Dequeue (BankersDequeue, fromList, popFront, pushBack)
+import Data.Hashable
+  ( hash
+  )
+import Data.Dequeue
+  ( BankersDequeue
+  , fromList
+  , popFront
+  , pushBack
+  )
+import Table
+  ( get_freq
+  , freq_to_stat
+  , is_member
+  , insert
+  , new
+  , to_list
+  )
 import OrbitUtils (now)
+import Types
+  ( Generator
+  , Freq
+  , Stats
+  , Vertex
+  , VTable
+  )
 
-type Generator = Vertex -> Vertex
 type Conf = ([Generator], Int)
 
 -- DATA
