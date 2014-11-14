@@ -21,7 +21,9 @@ import Table
   , new
   , to_list
   )
-import OrbitUtils (now)
+import WorkerAux
+  ( now
+  )
 import Types
   ( Generator
   , Freq
