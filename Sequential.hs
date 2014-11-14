@@ -1,14 +1,16 @@
 --
 -- orbit-int sequential implementation
 --
-module Sequential(orbit) where
+module Sequential(Generator
+                , orbit) where
 
 import Table (Freq, Stats, VTable, Vertex, get_freq, freq_to_stat, is_member, insert, new, to_list)
 import Data.Hashable (hash)
 import Data.Dequeue (BankersDequeue, fromList, popFront, pushBack)
 import OrbitUtils (now)
 
-type Conf = ([Vertex -> Vertex], Int)
+type Generator = Vertex -> Vertex
+type Conf = ([Generator], Int)
 
 -- DATA
 --   Static Machine Configuration:
@@ -24,7 +26,7 @@ type Conf = ([Vertex -> Vertex], Int)
 -- where the hash table is of size TableSize.
 -- The function returns a pair consisting of the computed orbit and a singleton
 -- list of statistics (mainly runtime and fill degree of the table).
-orbit :: [Vertex -> Vertex] -> [Vertex] -> Int -> ([Vertex],  [Stats])
+orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [Stats])
 orbit gs xs tableSize = (orbit, [stat])
         -- assemble static configuration
   where staticMachConf = mk_static_mach_conf gs tableSize  
@@ -81,10 +83,10 @@ hash_vertex staticMachConf x =
 -- auxiliary functions
 
 -- functions operating on the StaticMachConf
-mk_static_mach_conf :: [Vertex -> Vertex] -> Int -> Conf
+mk_static_mach_conf :: [Generator] -> Int -> Conf
 mk_static_mach_conf gs tableSize = (gs, tableSize)
 
-get_gens :: Conf -> [Vertex -> Vertex]
+get_gens :: Conf -> [Generator]
 get_gens staticMachConf = fst staticMachConf
 
 get_table_size :: Conf -> Int
