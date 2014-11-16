@@ -4,10 +4,17 @@
 module Master () where
 
 import Control.Distributed.Process
-  ( ProcessId
+  ( Process
+  , ProcessId
+  , receiveWait
+  , match
   )
 import qualified Sequential as Sq
   ( orbit
+  )
+import Credit
+  ( is_one
+  , credit
   )
 import Table
   ( sum_freqs
@@ -24,12 +31,116 @@ import WorkerAux
   )
 import Types
  ( Generator
- , Host
+ , HostInfo(..)
  , MaybeHosts(..)
  , ParConf
  , Stats
  , Vertex
  )
+
+-- DATA
+--   Static Machine Configuration:
+--     {Gs,               %list of generators
+--      Master,           %pid of master process
+--      Workers,          %list of Worker
+--      GlobalTableSize,  %size of global hash table
+--      IdleTimeout,      %milliseconds this worker idles before sending 'done'
+--      SpawnImgComp}     %true iff this worker spawns image computations
+--
+--   Worker:
+--     {Pid,              %pid of worker process
+--      TableOffset,      %offset (= index 0) of local table into global table
+--      TableSize}        %size of local hash table
+--
+--   Host:
+--     {Node,             %atom naming Erlang node
+--      Procs,            %number of processors
+--      TableSize,        %size of hash table per processor
+--      IdleTimeout}      %milliseconds a processor idles before sending 'done'
+--
+--   Statistics:
+--     List of pairs where the first component is an atom, the second
+--     some data. Part of the data is the fill frequency of the table
+--     (a list whose ith element indicates frequency of filling degree i).
+
+
+-- MESSAGES
+--   Master -> Worker:        {init, StaticMachConf}
+--
+--   Master/Worker -> Worker: {vertex, X, Slot, K}
+--                               %X is vertex
+--                               %Slot is slot of X on target worker
+--                               %K is atomic credit shipped with vertex
+--
+--   Worker -> Master:        {done, Cs}
+--                               %Cs is non-zero credit (rep as list of ints)
+--
+--   Master -> Worker:        {dump}
+--
+--   Worker -> Master:        {result, Xs, Stats}
+--                               %Xs is list of found orbit vertices
+--                               %Stats is statistics about worker's table
+
+
+-- compute orbit of elements in list Xs under list of generators Gs;
+-- the argument Hosts is either an integer N, a triple {P, N, T}, or
+-- a non-empty list [{H, P, N, T} | ...] of quadruples:
+-- * N:                       run the sequential algorithm with table size N
+-- * {P, N, T, S}:            run the parallel algorithm on P processors
+--                            each with table size N, idle timeout T and
+--                            spawn image computation flag S;
+-- * [{H, P, N, T, S} | ...]: run the distributed algorithm on the list of
+--                            hosts, where each quintuple {H, P, N, T, S}
+--                            specifies
+--                            * host name H (ie. name of Erlang node),
+--                            * number of processors P on H,
+--                            * table size N (per processor),
+--                            * idle timeout T, and
+--                            * spawn image computation flag S.
+-- The function returns a pair consisting of the computed orbit and
+-- a list of statistics, the first element of which reports overall statistics,
+-- and all remaining elements report statistics of some worker.
+orbit :: [Vertex -> Vertex] -> [Vertex] -> MaybeHosts -> ([Vertex],  [Stats])
+orbit gs xs (Seq tablesize) = Sq.orbit gs xs tablesize
+orbit gs xs (Par hostInfo)     = par_orbit gs xs hostInfo
+
+
+-- FIXME Write the proper par_orbit
+par_orbit :: [Vertex -> Vertex] -> [Vertex] -> HostInfo -> ([Vertex],  [Stats])
+par_orbit gs xs hosts = ([42], [[("xxx", "xxx")]])
+
+
+
+
+
+
+
+
+-- collect_credit collects leftover credit from idle workers until
+-- the credit adds up to 1.
+collect_credit :: [Int] -> Process ()
+collect_credit crdt =
+  case is_one crdt of
+    True  -> return ()
+    False -> receiveWait [
+        match $ \("done", workersCredit) ->
+          collect_credit $ credit workersCredit crdt
+      ]
+
+-- collect_orbit collects partial orbits and stats from N workers.
+collect_orbit :: Int -> Int -> (Process [Vertex], Process [Stats])
+collect_orbit elapsedTime n = (orbit, stats)
+  where x = do_collect_orbit n [] []
+        orbit = x >>= (\(partOrBits, _) -> return $ concat partOrBits)
+        stats = x >>= (\(_, workerStats) -> return $ (master_stats elapsedTime workerStats) : workerStats)
+
+do_collect_orbit :: Int -> [[Vertex]] -> [Stats] -> Process ([[Vertex]], [Stats])
+do_collect_orbit 0 partOrbits workerStats = return (partOrbits, workerStats)
+do_collect_orbit n partOrbits workerStats = do
+  receiveWait [
+      match $ \("result", partOrbit, workerStat) ->
+        do_collect_orbit (n - 1) (partOrbit : partOrbits) (workerStat : workerStats)
+    ]
 
 -------------------------------------------------------------------------------
 -- auxiliary functions

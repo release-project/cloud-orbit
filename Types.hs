@@ -4,7 +4,7 @@
 module Types ( Ct(..)
              , Generator
              , Freq
-             , Host
+             , HostInfo(..)
              , MaybeHosts(..)
              , ParConf
              , SeqConf
@@ -25,9 +25,10 @@ type Vertex = Int
 type VTable = Array Int [Vertex]
 type Stats  = [(String, String)]
 type Generator = Vertex -> Vertex
-type Host = (NodeId, Int, Int, Int) -- Node, Procs, TableSize, IdleTimeout
 data MaybeHosts = Seq Int
-                | Par [Host]
+                | Par HostInfo
+data HostInfo = JustOne (Int, Int, Int, Bool)         -- Procs, TableSize, IdleTimeout, SpwnImgComp
+              | Many [(NodeId, Int, Int, Int, Bool)]  -- NodeId, Procs, TableSize, IdleTimeout, SpwnImgComp
 type SeqConf = ([Generator], Int)
 type ParConf = ([Generator], ProcessId, [ProcessId], Int, Int, Bool)
 
