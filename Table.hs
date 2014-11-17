@@ -1,10 +1,12 @@
 --
 -- orbit-int hash table (storing vertices on a worker)
 --
-module Table( Freq
+module Table( -- Types
+              Freq
             , Stats
             , VTable
             , Vertex
+              -- Functions
             , new
             , to_list
             , is_member
@@ -24,7 +26,11 @@ module Table( Freq
             ) where
 
 import           Data.Array (Array, elems, listArray, (!), (//))
-import           Types      (Freq, Stats, VTable, Vertex)
+
+type Freq   = [Int]
+type Vertex = Int
+type VTable = Array Int [Vertex]
+type Stats  = [(String, String)]
 
 -- Note: Hash tables have a fixed number of slots but each slot can store
 -- a list of vertices. The functions is_member/3 and insert/3

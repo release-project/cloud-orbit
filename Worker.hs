@@ -1,10 +1,10 @@
 --
--- orbit-int worker
+-- orbit-int worker (computing vertices and holding part of hash table)
 --
-module Worker( defaultCt
-             , now
-             , worker_stats
-             , verts_recvd_from_stat
+module Worker( --init
+             --, distribute_vertices
+             --, send_image
+               verts_recvd_from_stat
              , credit_retd_from_stat
              , min_atomic_credit_from_stat
              , init_idle_from_stat
@@ -13,8 +13,20 @@ module Worker( defaultCt
              ) where
 
 import           Control.Distributed.Process (NodeId)
-import           Table                       (freq_to_stat)
-import           Types                       (Ct (..), Freq, Stats)
+
+import           Table                       (Freq, Stats, freq_to_stat)
+import           Utils                       (now)
+
+-- counters/timers record
+data Ct = Ct {
+    verts_recvd       :: Int        -- #vertices received by this server so far
+  , credit_retd       :: Int        -- #times server has returned credit to master
+  , min_atomic_credit :: Int        -- minimal atomic credit received so far
+  , last_event        :: Int        -- time stamp [ms] of most recent event
+  , init_idle         :: Int        -- idle time [ms] between init recv first vertex
+  , tail_idle         :: Int        -- idle time [ms] between send last vertex and dump
+  , max_idle          :: Int        -- max idle [ms] time between vertices
+}
 
 defaultCt :: Ct
 defaultCt = Ct { verts_recvd = 0
@@ -25,11 +37,6 @@ defaultCt = Ct { verts_recvd = 0
                , tail_idle = -1
                , max_idle = -1
                }
-
--- current wall clock time (in milliseconds since start of RTS)
--- FIXME get current wall clock time
-now :: Int
-now = 42
 
 -- produce readable statistics
 worker_stats :: NodeId -> Freq -> Ct -> Stats

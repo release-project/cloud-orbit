@@ -3,21 +3,31 @@
 --
 module Master where
 
-import           Control.Distributed.Process (Process, ProcessId, match,
-                                              receiveWait)
+import           Control.Distributed.Process (Process, ProcessId, NodeId,
+                                              match, receiveWait)
 import           Credit                      (credit, is_one)
-import qualified Sequential                  as Sq (orbit)
-import           Table                       (freq_from_stat, freq_to_stat,
-                                              sum_freqs)
-import           Types                       (Generator, HostInfo (..),
-                                              MaybeHosts (..), ParConf, Stats,
-                                              Vertex)
+import qualified Sequential                  as Sq (Generator, orbit)
+import           Table                       (Stats, Vertex, freq_from_stat,
+                                              freq_to_stat, sum_freqs)
 import           Worker                      (credit_retd_from_stat,
                                               init_idle_from_stat,
                                               max_idle_from_stat,
                                               min_atomic_credit_from_stat,
                                               tail_idle_from_stat,
                                               verts_recvd_from_stat)
+
+data MaybeHosts = Seq Int
+                | Par HostInfo
+data HostInfo = JustOne (Int,  -- Number of processes
+                         Int,  -- Table size
+                         Int,  -- Idle timeout
+                         Bool) -- Spawn image comp
+              | Many    [(NodeId, -- Node id
+                          Int,    -- Number of processes
+                          Int,    -- Table size
+                          Int,    -- Idle timeout
+                          Bool)]  -- Spawn image comp
+type ParConf = ([Sq.Generator], ProcessId, [ProcessId], Int, Int, Bool)
 
 -- DATA
 --   Static Machine Configuration:
@@ -126,10 +136,10 @@ do_collect_orbit n partOrbits workerStats = do
 -- auxiliary functions
 
 -- functions operating on the StaticMachConf
-mk_static_mach_conf :: [Generator] -> ProcessId -> [ProcessId] -> Int -> ParConf
+mk_static_mach_conf :: [Sq.Generator] -> ProcessId -> [ProcessId] -> Int -> ParConf
 mk_static_mach_conf gs master workers globalTableSize = (gs, master, workers, globalTableSize, 0, True)
 
-get_gens :: ParConf -> [Generator]
+get_gens :: ParConf -> [Sq.Generator]
 get_gens (gs, _, _, _, _, _) = gs
 
 get_master :: ParConf -> ProcessId
@@ -175,4 +185,3 @@ master_stats elapsedTime workerStats = ("wall_time", show elapsedTime)
         maxIdle = foldl max (head idles) (tail idles)
         tailIdles = map tail_idle_from_stat workerStats
         maxTailIdle = foldl max (head tailIdles) (tail tailIdles)
-

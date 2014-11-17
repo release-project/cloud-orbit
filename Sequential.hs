@@ -1,16 +1,22 @@
 --
 -- orbit-int sequential implementation
 --
-module Sequential( Generator
+module Sequential( -- Types
+                   Generator
+                   -- Functions
                  , orbit
                  ) where
 
 import           Data.Dequeue  (BankersDequeue, fromList, popFront, pushBack)
 import           Data.Hashable (hash)
-import           Table         (freq_to_stat, get_freq, insert, is_member, new,
+
+import           Table         (Freq, Stats, Vertex, VTable,
+                                freq_to_stat, get_freq, insert, is_member, new,
                                 to_list)
-import           Types         (Freq, Generator, SeqConf, Stats, VTable, Vertex)
-import           Worker        (now)
+import           Utils         (now)
+
+type Generator = Vertex -> Vertex
+type SeqConf = ([Generator], Int)
 
 -- DATA
 --   Static Machine Configuration:
@@ -28,8 +34,8 @@ import           Worker        (now)
 -- list of statistics (mainly runtime and fill degree of the table).
 orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [Stats])
 orbit gs xs tableSize = (orbit, [stat])
-        -- assemble static configuration
-  where staticMachConf = mk_static_mach_conf gs tableSize
+  where -- assemble static configuration
+        staticMachConf = mk_static_mach_conf gs tableSize
         -- initialise hash table and work queue
         table = new tableSize
         queue = fromList xs
