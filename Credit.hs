@@ -8,7 +8,8 @@ module Credit( credit
              , zero
              , one
              , is_zero
-             , is_one) where
+             , is_one
+             ) where
 
 -- An *atomic credit* is represented as a non-negative integer k;
 -- it stands for the credit 1/{2^k}.

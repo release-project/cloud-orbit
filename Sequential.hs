@@ -1,8 +1,9 @@
 --
 -- orbit-int sequential implementation
 --
-module Sequential(Generator
-                , orbit) where
+module Sequential( Generator
+                 , orbit
+                 ) where
 
 import           Data.Dequeue  (BankersDequeue, fromList, popFront, pushBack)
 import           Data.Hashable (hash)

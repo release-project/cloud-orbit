@@ -1,7 +1,7 @@
 --
 -- orbit-int master (controlling orbit computation)
 --
-module Master () where
+module Master where
 
 import           Control.Distributed.Process (Process, ProcessId, match,
                                               receiveWait)

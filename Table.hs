@@ -20,7 +20,8 @@ module Table( Freq
             , avg_nonempty_freq
             , freq_to_stat
             , freq_from_stat
-            , fill_deg) where
+            , fill_deg
+            ) where
 
 import           Data.Array (Array, elems, listArray, (!), (//))
 import           Types      (Freq, Stats, VTable, Vertex)
