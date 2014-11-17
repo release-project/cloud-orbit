@@ -21,7 +21,7 @@ import Table
   , new
   , to_list
   )
-import WorkerAux
+import Worker
   ( now
   )
 import Types

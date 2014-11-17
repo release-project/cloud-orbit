@@ -21,7 +21,7 @@ import Table
   , freq_from_stat
   , freq_to_stat
   )
-import WorkerAux
+import Worker
   ( verts_recvd_from_stat
   , credit_retd_from_stat
   , min_atomic_credit_from_stat

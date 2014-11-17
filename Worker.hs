@@ -1,16 +1,16 @@
 --
 -- orbit-int workeraux 
 --
-module WorkerAux ( defaultCt
-                 , now
-                 , worker_stats
-                 , verts_recvd_from_stat
-                 , credit_retd_from_stat
-                 , min_atomic_credit_from_stat
-                 , init_idle_from_stat
-                 , tail_idle_from_stat
-                 , max_idle_from_stat
-                 ) where
+module Worker ( defaultCt
+              , now
+              , worker_stats
+              , verts_recvd_from_stat
+              , credit_retd_from_stat
+              , min_atomic_credit_from_stat
+              , init_idle_from_stat
+              , tail_idle_from_stat
+              , max_idle_from_stat
+              ) where
 
 import Control.Distributed.Process
   ( NodeId
