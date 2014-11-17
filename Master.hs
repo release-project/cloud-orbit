@@ -3,40 +3,21 @@
 --
 module Master () where
 
-import Control.Distributed.Process
-  ( Process
-  , ProcessId
-  , receiveWait
-  , match
-  )
-import qualified Sequential as Sq
-  ( orbit
-  )
-import Credit
-  ( is_one
-  , credit
-  )
-import Table
-  ( sum_freqs
-  , freq_from_stat
-  , freq_to_stat
-  )
-import Worker
-  ( verts_recvd_from_stat
-  , credit_retd_from_stat
-  , min_atomic_credit_from_stat
-  , init_idle_from_stat
-  , max_idle_from_stat
-  , tail_idle_from_stat
-  )
-import Types
- ( Generator
- , HostInfo(..)
- , MaybeHosts(..)
- , ParConf
- , Stats
- , Vertex
- )
+import           Control.Distributed.Process (Process, ProcessId, match,
+                                              receiveWait)
+import           Credit                      (credit, is_one)
+import qualified Sequential                  as Sq (orbit)
+import           Table                       (freq_from_stat, freq_to_stat,
+                                              sum_freqs)
+import           Types                       (Generator, HostInfo (..),
+                                              MaybeHosts (..), ParConf, Stats,
+                                              Vertex)
+import           Worker                      (credit_retd_from_stat,
+                                              init_idle_from_stat,
+                                              max_idle_from_stat,
+                                              min_atomic_credit_from_stat,
+                                              tail_idle_from_stat,
+                                              verts_recvd_from_stat)
 
 -- DATA
 --   Static Machine Configuration:

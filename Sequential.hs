@@ -4,34 +4,12 @@
 module Sequential(Generator
                 , orbit) where
 
-import Data.Hashable
-  ( hash
-  )
-import Data.Dequeue
-  ( BankersDequeue
-  , fromList
-  , popFront
-  , pushBack
-  )
-import Table
-  ( get_freq
-  , freq_to_stat
-  , is_member
-  , insert
-  , new
-  , to_list
-  )
-import Worker
-  ( now
-  )
-import Types
-  ( Generator
-  , Freq
-  , SeqConf
-  , Stats
-  , Vertex
-  , VTable
-  )
+import           Data.Dequeue  (BankersDequeue, fromList, popFront, pushBack)
+import           Data.Hashable (hash)
+import           Table         (freq_to_stat, get_freq, insert, is_member, new,
+                                to_list)
+import           Types         (Freq, Generator, SeqConf, Stats, VTable, Vertex)
+import           Worker        (now)
 
 -- DATA
 --   Static Machine Configuration:
@@ -50,7 +28,7 @@ import Types
 orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [Stats])
 orbit gs xs tableSize = (orbit, [stat])
         -- assemble static configuration
-  where staticMachConf = mk_static_mach_conf gs tableSize  
+  where staticMachConf = mk_static_mach_conf gs tableSize
         -- initialise hash table and work queue
         table = new tableSize
         queue = fromList xs

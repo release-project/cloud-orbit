@@ -1,5 +1,5 @@
 --
--- orbit-int workeraux 
+-- orbit-int worker
 --
 module Worker ( defaultCt
               , now
@@ -12,17 +12,9 @@ module Worker ( defaultCt
               , max_idle_from_stat
               ) where
 
-import Control.Distributed.Process
-  ( NodeId
-  )
-import Types
-  ( Ct(..)
-  , Freq
-  , Stats
-  )
-import Table
-  ( freq_to_stat
-  )
+import           Control.Distributed.Process (NodeId)
+import           Table                       (freq_to_stat)
+import           Types                       (Ct (..), Freq, Stats)
 
 defaultCt = Ct {
   verts_recvd = 0
@@ -51,37 +43,37 @@ worker_stats node frequency statData = ("node", show node)
                                      : freq_to_stat frequency
 
 verts_recvd_from_stat :: Stats -> Int
-verts_recvd_from_stat stat = 
+verts_recvd_from_stat stat =
   case "vertices_recvd" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false
 
 credit_retd_from_stat :: Stats -> Int
-credit_retd_from_stat stat = 
+credit_retd_from_stat stat =
   case "credit_retd" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false
 
 min_atomic_credit_from_stat :: Stats -> Int
-min_atomic_credit_from_stat stat = 
+min_atomic_credit_from_stat stat =
   case "min_atomic_credit" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false
 
 init_idle_from_stat :: Stats -> Int
-init_idle_from_stat stat = 
+init_idle_from_stat stat =
   case "init_idle_time" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false
 
 tail_idle_from_stat :: Stats -> Int
-tail_idle_from_stat stat = 
+tail_idle_from_stat stat =
   case "tail_idle_time" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false
 
 max_idle_from_stat :: Stats -> Int
-max_idle_from_stat stat = 
+max_idle_from_stat stat =
   case "max_idle_time" `lookup` stat of
     Just val -> read val :: Int
     Nothing  -> 0  -- instead of false

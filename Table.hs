@@ -22,19 +22,8 @@ module Table( Freq
             , freq_from_stat
             , fill_deg) where
 
-import Data.Array
-  (Array
-  , elems
-  , listArray
-  , (!)
-  , (//)
-  )
-import Types
-  ( Freq
-  , Stats
-  , Vertex
-  , VTable
-  )
+import           Data.Array (Array, elems, listArray, (!), (//))
+import           Types      (Freq, Stats, VTable, Vertex)
 
 -- Note: Hash tables have a fixed number of slots but each slot can store
 -- a list of vertices. The functions is_member/3 and insert/3
