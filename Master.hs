@@ -93,45 +93,50 @@ type ParConf = ([Sq.Generator], ProcessId, [ProcessId], Int, Int, Bool)
 -- The function returns a pair consisting of the computed orbit and
 -- a list of statistics, the first element of which reports overall statistics,
 -- and all remaining elements report statistics of some worker.
-orbit :: [Vertex -> Vertex] -> [Vertex] -> MaybeHosts -> ([Vertex],  [MasterStats])
+orbit :: [Vertex -> Vertex] -> [Vertex] -> MaybeHosts
+         -> ([Vertex],  [MasterStats])
 orbit gs xs (Seq tablesize) = Sq.orbit gs xs tablesize
 orbit gs xs (Par hostInfo)     = par_orbit gs xs hostInfo
 
 -- FIXME Write the proper par_orbit
-par_orbit :: [Vertex -> Vertex] -> [Vertex] -> HostInfo -> ([Vertex],  [MasterStats])
+par_orbit :: [Vertex -> Vertex] -> [Vertex] -> HostInfo
+             -> ([Vertex],  [MasterStats])
 par_orbit gs xs hosts = ([42], [[("xxx", "xxx")]])
 
 -- collect_credit collects leftover credit from idle workers until
 -- the credit adds up to 1.
 collect_credit :: [Int] -> Process ()
 collect_credit crdt =
-  case is_one crdt of
-    True  -> return ()
-    False -> receiveWait [
-        match $ \("done", workersCredit) ->
-          collect_credit $ credit workersCredit crdt
-      ]
+    case is_one crdt of
+        True  -> return ()
+        False -> receiveWait [
+                     match $ \("done", workersCredit) ->
+                       collect_credit $ credit workersCredit crdt
+                   ]
 
 -- collect_orbit collects partial orbits and stats from N workers.
 collect_orbit :: Int -> Int -> Process ([Vertex], [MasterStats])
 collect_orbit elapsedTime n = do
-  (orbit, stats) <- do_collect_orbit n [] []
-  return (concat orbit, master_stats elapsedTime stats : stats)
+    (orbit, stats) <- do_collect_orbit n [] []
+    return (concat orbit, master_stats elapsedTime stats : stats)
 
-do_collect_orbit :: Int -> [[Vertex]] -> [WorkerStats] -> Process ([[Vertex]], [WorkerStats])
+do_collect_orbit :: Int -> [[Vertex]] -> [WorkerStats]
+                    -> Process ([[Vertex]], [WorkerStats])
 do_collect_orbit 0 partOrbits workerStats = return (partOrbits, workerStats)
 do_collect_orbit n partOrbits workerStats = do
-  receiveWait [
-      match $ \("result", partOrbit, workerStat) ->
-        do_collect_orbit (n - 1) (partOrbit : partOrbits) (workerStat : workerStats)
-    ]
+    receiveWait [
+        match $ \("result", partOrbit, workerStat) ->
+          do_collect_orbit (n - 1) (partOrbit : partOrbits) (workerStat : workerStats)
+      ]
 
 -------------------------------------------------------------------------------
 -- auxiliary functions
 
 -- functions operating on the StaticMachConf
-mk_static_mach_conf :: [Sq.Generator] -> ProcessId -> [ProcessId] -> Int -> ParConf
-mk_static_mach_conf gs master workers globalTableSize = (gs, master, workers, globalTableSize, 0, True)
+mk_static_mach_conf :: [Sq.Generator] -> ProcessId -> [ProcessId] -> Int
+                       -> ParConf
+mk_static_mach_conf gs master workers globalTableSize =
+    (gs, master, workers, globalTableSize, 0, True)
 
 get_gens :: ParConf -> [Sq.Generator]
 get_gens (gs, _, _, _, _, _) = gs
@@ -153,10 +158,12 @@ get_spawn_img_comp (_, _, _, _, _, spawmImgComp) = spawmImgComp
 
 
 set_idle_timeout :: ParConf -> Int -> ParConf
-set_idle_timeout (gs, mst, wks, gts, timeout, spic) x = (gs, mst, wks, gts, x, spic)
+set_idle_timeout (gs, mst, wks, gts, timeout, spic) x =
+    (gs, mst, wks, gts, x, spic)
 
 clear_spawn_img_comp :: ParConf -> ParConf
-clear_spawn_img_comp (gs, mst, wks, gts, tmt, spawmImgComp) = (gs, mst, wks, gts, tmt, False)
+clear_spawn_img_comp (gs, mst, wks, gts, tmt, spawmImgComp) =
+    (gs, mst, wks, gts, tmt, False)
 
 -- produce readable statistics
 master_stats :: Int -> [WorkerStats] -> MasterStats

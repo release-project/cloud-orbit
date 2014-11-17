@@ -54,34 +54,37 @@ orbit gs xs tableSize = (orbit, [stat])
 -- Table          -- hash table holding vertices
 -- Queue          -- work queue
 -- VertsRecvd     -- number of vertices removed from the Queue so far
-vertex_server :: SeqConf -> VTable -> BankersDequeue Vertex -> Int -> (VTable, Int)
+vertex_server :: SeqConf -> VTable -> BankersDequeue Vertex -> Int
+                 -> (VTable, Int)
 vertex_server staticMachConf table queue vertsRecvd =
-  case popFront queue of
-    (Nothing, _)     -> (table, vertsRecvd)
-    (Just x, queue1) -> vertex_server staticMachConf newTable newQueue (vertsRecvd + 1)
-      where (newTable, newQueue) = handle_vertex staticMachConf x table queue1
+    case popFront queue of
+        (Nothing, _)     -> (table, vertsRecvd)
+        (Just x, queue1) ->
+            let (newTable, newQueue) = handle_vertex staticMachConf x table queue1
+            in vertex_server staticMachConf newTable newQueue (vertsRecvd + 1)
 
 -- handle_vertex checks whether vertex X is stored in Table;
 -- if not, it is in inserted and the images of the generators
 -- are pushed into the work queue.
-handle_vertex :: SeqConf -> Vertex -> VTable -> BankersDequeue Vertex -> (VTable, BankersDequeue Vertex)
+handle_vertex :: SeqConf -> Vertex -> VTable -> BankersDequeue Vertex
+                 -> (VTable, BankersDequeue Vertex)
 handle_vertex staticMachConf x table queue =
-  case is_member x slot table of                -- check whether X is already in Table
-    -- X already in table; do nothing
-    True  -> (table, queue)
-    -- X not in table
-    False -> (newTable, newQueue)               -- return updated table and queue
-      where newTable = insert x slot table      -- insert X at Slot
-            xs = [g x | g <- gs]                -- compute images of X under generators Gs
-            newQueue = foldl pushBack queue xs  -- enquene Xs
-  where gs = get_gens staticMachConf
-        slot = hash_vertex staticMachConf x     -- compute Slot
-
+    case is_member x slot table of                -- check whether X is already in Table
+        -- X already in table; do nothing
+        True  -> (table, queue)
+        -- X not in table
+        False ->
+            let -- insert X at Slot
+                newTable = insert x slot table
+                -- compute images of X under generators Gs and enqueue
+                xs = [g x | g <- get_gens staticMachConf]
+                newQueue = foldl pushBack queue xs
+            in (newTable, newQueue) -- return updated table and queue
+  where slot = hash_vertex staticMachConf x -- compute Slot
 
 -- hash_vertex computes the hash table slot of vertex X
 hash_vertex :: SeqConf -> Vertex -> Int
-hash_vertex staticMachConf x =
-  hsh `rem` tableSize
+hash_vertex staticMachConf x = hsh `rem` tableSize
   where tableSize = get_table_size staticMachConf
         hsh = abs $ hash x
 
@@ -104,4 +107,3 @@ seq_stats elapsedTime frequency vertsRecvd =
       ("wall_time", show elapsedTime)
     : ("vertices_recvd", show vertsRecvd)
     : freq_to_stat frequency
-

@@ -81,7 +81,7 @@ init_idle_from_stat stat =
 
 tail_idle_from_stat :: WorkerStats -> Int
 tail_idle_from_stat stat =
-  case "tail_idle_time" `lookup` stat of
+    case "tail_idle_time" `lookup` stat of
         Just val -> read val :: Int
         Nothing  -> 0  -- instead of false
 
