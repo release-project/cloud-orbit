@@ -128,11 +128,10 @@ collect_credit crdt =
       ]
 
 -- collect_orbit collects partial orbits and stats from N workers.
-collect_orbit :: Int -> Int -> (Process [Vertex], Process [Stats])
-collect_orbit elapsedTime n = (orbit, stats)
-  where x = do_collect_orbit n [] []
-        orbit = x >>= (\(partOrBits, _) -> return $ concat partOrBits)
-        stats = x >>= (\(_, workerStats) -> return $ (master_stats elapsedTime workerStats) : workerStats)
+collect_orbit :: Int -> Int -> Process ([Vertex], [Stats])
+collect_orbit elapsedTime n = do
+  (orbit, stats) <- do_collect_orbit n [] []
+  return (concat orbit, master_stats elapsedTime stats : stats)
 
 do_collect_orbit :: Int -> [[Vertex]] -> [Stats] -> Process ([[Vertex]], [Stats])
 do_collect_orbit 0 partOrbits workerStats = return (partOrbits, workerStats)
