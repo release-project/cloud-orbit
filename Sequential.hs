@@ -10,13 +10,13 @@ module Sequential( -- Types
 import           Data.Dequeue  (BankersDequeue, fromList, popFront, pushBack)
 import           Data.Hashable (hash)
 
-import           Table         (Freq, Stats, Vertex, VTable,
-                                freq_to_stat, get_freq, insert, is_member, new,
-                                to_list)
+import           Table         (Freq, Vertex, VTable, freq_to_stat, get_freq,
+                                insert, is_member, new, to_list)
 import           Utils         (now)
 
 type Generator = Vertex -> Vertex
 type SeqConf = ([Generator], Int)
+type SeqStats = [(String, String)]
 
 -- DATA
 --   Static Machine Configuration:
@@ -32,7 +32,7 @@ type SeqConf = ([Generator], Int)
 -- where the hash table is of size TableSize.
 -- The function returns a pair consisting of the computed orbit and a singleton
 -- list of statistics (mainly runtime and fill degree of the table).
-orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [Stats])
+orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [SeqStats])
 orbit gs xs tableSize = (orbit, [stat])
   where -- assemble static configuration
         staticMachConf = mk_static_mach_conf gs tableSize
@@ -99,7 +99,9 @@ get_table_size :: SeqConf -> Int
 get_table_size staticMachConf = snd staticMachConf
 
 -- produce readable statistics
-seq_stats :: Int -> Freq -> Int -> Stats
+seq_stats :: Int -> Freq -> Int -> SeqStats
 seq_stats elapsedTime frequency vertsRecvd =
-  ("wall_time", show elapsedTime) : ("vertices_recvd", show vertsRecvd) : freq_to_stat frequency
+      ("wall_time", show elapsedTime)
+    : ("vertices_recvd", show vertsRecvd)
+    : freq_to_stat frequency
 

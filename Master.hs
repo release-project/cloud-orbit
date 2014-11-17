@@ -7,15 +7,17 @@ import           Control.Distributed.Process (Process, ProcessId, NodeId,
                                               match, receiveWait)
 import           Credit                      (credit, is_one)
 import qualified Sequential                  as Sq (Generator, orbit)
-import           Table                       (Stats, Vertex, freq_from_stat,
+import           Table                       (Vertex, freq_from_stat,
                                               freq_to_stat, sum_freqs)
-import           Worker                      (credit_retd_from_stat,
+import           Worker                      (WorkerStats,
+                                              credit_retd_from_stat,
                                               init_idle_from_stat,
                                               max_idle_from_stat,
                                               min_atomic_credit_from_stat,
                                               tail_idle_from_stat,
                                               verts_recvd_from_stat)
 
+type MasterStats = [(String, String)]
 data MaybeHosts = Seq Int
                 | Par HostInfo
 data HostInfo = JustOne (Int,  -- Number of processes
@@ -91,21 +93,13 @@ type ParConf = ([Sq.Generator], ProcessId, [ProcessId], Int, Int, Bool)
 -- The function returns a pair consisting of the computed orbit and
 -- a list of statistics, the first element of which reports overall statistics,
 -- and all remaining elements report statistics of some worker.
-orbit :: [Vertex -> Vertex] -> [Vertex] -> MaybeHosts -> ([Vertex],  [Stats])
+orbit :: [Vertex -> Vertex] -> [Vertex] -> MaybeHosts -> ([Vertex],  [MasterStats])
 orbit gs xs (Seq tablesize) = Sq.orbit gs xs tablesize
 orbit gs xs (Par hostInfo)     = par_orbit gs xs hostInfo
 
-
 -- FIXME Write the proper par_orbit
-par_orbit :: [Vertex -> Vertex] -> [Vertex] -> HostInfo -> ([Vertex],  [Stats])
+par_orbit :: [Vertex -> Vertex] -> [Vertex] -> HostInfo -> ([Vertex],  [MasterStats])
 par_orbit gs xs hosts = ([42], [[("xxx", "xxx")]])
-
-
-
-
-
-
-
 
 -- collect_credit collects leftover credit from idle workers until
 -- the credit adds up to 1.
@@ -119,12 +113,12 @@ collect_credit crdt =
       ]
 
 -- collect_orbit collects partial orbits and stats from N workers.
-collect_orbit :: Int -> Int -> Process ([Vertex], [Stats])
+collect_orbit :: Int -> Int -> Process ([Vertex], [MasterStats])
 collect_orbit elapsedTime n = do
   (orbit, stats) <- do_collect_orbit n [] []
   return (concat orbit, master_stats elapsedTime stats : stats)
 
-do_collect_orbit :: Int -> [[Vertex]] -> [Stats] -> Process ([[Vertex]], [Stats])
+do_collect_orbit :: Int -> [[Vertex]] -> [WorkerStats] -> Process ([[Vertex]], [WorkerStats])
 do_collect_orbit 0 partOrbits workerStats = return (partOrbits, workerStats)
 do_collect_orbit n partOrbits workerStats = do
   receiveWait [
@@ -165,15 +159,16 @@ clear_spawn_img_comp :: ParConf -> ParConf
 clear_spawn_img_comp (gs, mst, wks, gts, tmt, spawmImgComp) = (gs, mst, wks, gts, tmt, False)
 
 -- produce readable statistics
-master_stats :: Int -> [Stats] -> Stats
-master_stats elapsedTime workerStats = ("wall_time", show elapsedTime)
-                                     : ("vertices_recvd", show vertsRecvd)
-                                     : ("credit_retd", show creditRetd)
-                                     : ("min_atomic_credit", show minAtomicCredit)
-                                     : ("max_init_idle_time", show maxInitIdle)
-                                     : ("max_idle_time", show maxIdle)
-                                     : ("max_tail_idle_time", show maxTailIdle)
-                                     : freq_to_stat freq
+master_stats :: Int -> [WorkerStats] -> MasterStats
+master_stats elapsedTime workerStats =
+      ("wall_time", show elapsedTime)
+    : ("vertices_recvd", show vertsRecvd)
+    : ("credit_retd", show creditRetd)
+    : ("min_atomic_credit", show minAtomicCredit)
+    : ("max_init_idle_time", show maxInitIdle)
+    : ("max_idle_time", show maxIdle)
+    : ("max_tail_idle_time", show maxTailIdle)
+    : freq_to_stat freq
   where freq = sum_freqs $ map freq_from_stat workerStats
         vertsRecvd = sum $ map verts_recvd_from_stat workerStats
         creditRetd = sum $ map credit_retd_from_stat workerStats
