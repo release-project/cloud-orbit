@@ -23,9 +23,10 @@ import           Control.Distributed.Process (Process, ProcessId, NodeId,
 import           Data.Hashable               (hash)
 import           Data.Maybe                  (fromJust)
 
-import           Credit                      (ACredit, Credit, credit, credit_atomic,
-                                              debit_atomic, debit_atomic_nz,
-                                              is_one, is_zero, zero)
+import           Credit                      (ACredit, Credit, credit,
+                                              credit_atomic, debit_atomic,
+                                              debit_atomic_nz, is_one, is_zero,
+                                              zero)
 import qualified Sequential                  as Sq (Generator, orbit)
 import           Table                       (Freq, Vertex, VTable,
                                               freq_from_stat, freq_to_stat,
@@ -234,18 +235,19 @@ defaultCt = Ct { verts_recvd = 0
 
 -- initialise worker
 init :: Int -> Int -> Bool -> Process ()
-init localTableSize idleTimeout spawnImgComp = do
-    let table = new localTableSize
+init localTableSize idleTimeout spawnImgComp =
     receiveWait [
         match $ \("init", staticMachConf0) -> do
-            let statData = defaultCt
-                staticMachConf1 = set_idle_timeout staticMachConf0 idleTimeout
-                staticMachConf = if spawnImgComp then staticMachConf1
-                                                 else clear_spawn_img_comp staticMachConf1
-                credit = zero
-            vertex_server staticMachConf credit table statData
+            let staticMachConf1 = set_idle_timeout staticMachConf0 idleTimeout
+                staticMachConf =
+                    if spawnImgComp then staticMachConf1
+                                    else clear_spawn_img_comp staticMachConf1
+            vertex_server staticMachConf zero (new localTableSize) defaultCt
       ]
 
+vertex_server :: ParConf -> Credit -> VTable -> Ct -> Process ()
+vertex_server _ _ _ _ = return ()
+{-
 -- main worker loop: server handling vertex messages;
 -- StaticMachConf: info about machine configuration
 -- Credit: credit currently held by the server,
@@ -286,6 +288,7 @@ vertex_server staticMachConf credit table statData = do
                       let newStatData = statData {credit_retd = newCreditRetd}
                       vertex_server staticMachConf zero table newStatData
         Just _  -> return ()
+-}
 
 -- handle_vertex checks whether vertex X is stored in Slot of Table;
 -- if not, it is in inserted there and the images of the generators
@@ -294,7 +297,6 @@ vertex_server staticMachConf credit table statData = do
 handle_vertex :: ParConf -> Vertex -> Int -> Credit -> VTable
                  -> Process (Credit, VTable)
 handle_vertex staticMachConf x slot credit table
-    -- check whether x is already in table
     | is_member x slot table = return (credit, table) -- x already in table;
                                                       -- do nothing
     | otherwise = do -- x not in table
