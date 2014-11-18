@@ -14,6 +14,7 @@ module Worker( --init
              ) where
 
 import           Control.Distributed.Process (NodeId)
+import           Data.Maybe                  (fromJust)
 
 import           Table                       (Freq, freq_to_stat)
 import           Utils                       (now)
@@ -57,36 +58,24 @@ worker_stats node frequency statData =
 
 verts_recvd_from_stat :: WorkerStats -> Int
 verts_recvd_from_stat stat =
-    case "vertices_recvd" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("vertices_recvd" `lookup` stat)) :: Int
 
 credit_retd_from_stat :: WorkerStats -> Int
 credit_retd_from_stat stat =
-    case "credit_retd" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("credit_retd" `lookup` stat)) :: Int
 
 min_atomic_credit_from_stat :: WorkerStats -> Int
 min_atomic_credit_from_stat stat =
-    case "min_atomic_credit" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("min_atomic_credit" `lookup` stat)) :: Int
 
 init_idle_from_stat :: WorkerStats -> Int
 init_idle_from_stat stat =
-    case "init_idle_time" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("init_idle_time" `lookup` stat)) :: Int
 
 tail_idle_from_stat :: WorkerStats -> Int
 tail_idle_from_stat stat =
-    case "tail_idle_time" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("tail_idle_time" `lookup` stat)) :: Int
 
 max_idle_from_stat :: WorkerStats -> Int
 max_idle_from_stat stat =
-    case "max_idle_time" `lookup` stat of
-        Just val -> read val :: Int
-        Nothing  -> 0  -- instead of false
+    read (fromJust ("max_idle_time" `lookup` stat)) :: Int
