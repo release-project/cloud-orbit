@@ -13,11 +13,11 @@ module Bench( -- sets of generators
             , dist, dist_seq
             ) where
 
-import Data.List      (lookup)
-import Data.Maybe     (fromMaybe)
+import Data.List           (lookup)
+import Data.Maybe          (fromMaybe)
 
-import Prelude hiding (seq)
-import Master         (HostInfo(..), MaybeHosts(..), orbit)
+import Prelude      hiding (seq)
+import MasterWorker        (HostInfo(..), MaybeHosts(..), orbit)
 
 -----------------------------------------------------------------------------
 -- generators
