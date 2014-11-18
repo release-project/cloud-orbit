@@ -145,4 +145,6 @@ dist_seq generators n p workers =
   where w = length workers
 
 sz (_, mainStats : _) =
-    "False" `fromMaybe` ("size" `lookup` mainStats)
+    case "size" `lookup` mainStats of
+        Nothing -> "false"
+        Just s  -> "{size," ++ s ++ "}"
