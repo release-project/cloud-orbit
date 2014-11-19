@@ -6,7 +6,7 @@ module Bench( -- sequential benchmarks
             , dist, dist_seq
             ) where
 
-import Control.Distributed.Process
+import Control.Distributed.Process        (Process, ProcessId, NodeId)
 import Data.List                          (lookup)
 import Data.Maybe                         (fromMaybe)
 import Prelude                     hiding (seq)

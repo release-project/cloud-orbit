@@ -14,7 +14,6 @@ import           Table         (Freq, Vertex, VTable, freq_to_stat, get_freq,
                                 insert, is_member, new, to_list)
 import           Utils         (Generator, now)
 
-
 type SeqConf = ([Generator], Int)
 type SeqStats = [(String, String)]
 
