@@ -6,11 +6,14 @@ module Bench( -- sequential benchmarks
             , dist, dist_seq
             ) where
 
-import Data.List           (lookup)
-import Data.Maybe          (fromMaybe)
-import Prelude      hiding (seq)
+import Control.Distributed.Process        (Process, NodeId)
+import Data.List                          (lookup)
+import Data.Maybe                         (fromMaybe)
+import Prelude                     hiding (seq)
 
-import MasterWorker        (HostInfo(..), MaybeHosts(..), orbit)
+import MasterWorker                       (HostInfo(..), MaybeHosts(..),
+                                           GenClos, MasterStats, orbit)
+import Table                              (Vertex)
 import Utils
 
 -----------------------------------------------------------------------------
@@ -20,30 +23,40 @@ import Utils
 -- * number of processors P > 0 (per node)
 -- * list of Workers (in short node name format 'name@host')
 -- sequential orbit computation
+seq :: (Int -> GenClos) -> Int -> Process String
 seq generators n =
-    sz $ orbit (generators n) [0] (Seq (2 * n))
+    orbit (generators n) [0] (Seq (2 * n)) >>= return . sz . snd
 
 -- parallel orbit computation (par_seq/3 does not spawn image computation)
+par :: (Int -> GenClos) -> Int -> Int -> Process String
 par generators n p =
-    sz $ orbit (generators n) [0]
-      (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, True)))
+     orbit (generators n) [0]
+       (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, True)))
+       >>= return . sz . snd
 
+par_seq :: (Int -> GenClos) -> Int -> Int -> Process String
 par_seq generators n p =
-    sz $ orbit (generators n) [0]
+    orbit (generators n) [0]
       (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, False)))
+      >>= return . sz . snd
 
 -- distributed orbit computation (dist_seq/4 does not spawn image computation)
+dist :: (Int -> GenClos) -> Int -> Int -> [NodeId] -> Process String
 dist generators n p workers =
-    sz $ orbit (generators n) [0]
+    orbit (generators n) [0]
       (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, True) | h <- workers]))
+      >>= return . sz . snd
   where w = length workers
 
+dist_seq :: (Int -> GenClos) -> Int -> Int -> [NodeId] -> Process String
 dist_seq generators n p workers =
-    sz $ orbit (generators n) [0]
+    orbit (generators n) [0]
       (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, False) | h <- workers]))
+      >>= return . sz . snd
   where w = length workers
 
-sz (_, mainStats : _) =
+sz :: [MasterStats] -> String
+sz (mainStats : _) =
     case "size" `lookup` mainStats of
         Nothing -> "false"
         Just s  -> "{size," ++ s ++ "}"

@@ -5,6 +5,7 @@
 module MasterWorker( -- Master
                      GenClos
                    , HostInfo (..)
+                   , MasterStats
                    , MaybeHosts(..)
                    , orbit
                    , get_gens, get_master, get_workers, get_spawn_img_comp
