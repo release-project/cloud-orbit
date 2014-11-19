@@ -1,4 +1,22 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Utils where
+
+import           Data.Binary
+import           Data.Typeable
+
+-- Trying to serialize ParConf closures...
+newtype GenClos = GenClos (String, Int, [Generator])
+    deriving (Typeable)
+
+instance Show GenClos where
+    showsPrec p (GenClos (name, _, _)) = (name ++)
+
+instance Binary GenClos where
+    put (GenClos (name, n, _)) = put (name, n)
+    get = get >>= \(name, n) -> return $ GenClos (name, n, dispatcher name n)
+
+type Generator = Vertex -> Vertex
+type Vertex = Int
 
 -----------------------------------------------------------------------------
 -- generators
@@ -58,12 +76,20 @@ f5 n x = r n $ (fib (p3 10 0 (s5 0 900 999 1000 (r 1000 x)))) + p2 1 x
 
 -- sets (= lists) of generators
 g _ = []
+gg n = GenClos ("g", n, (g n))
 
 g1 n = [f1 n]
 g2 n = [f2 n]
 g3 n = [f3 n]
 g4 n = [f4 n]
 g5 n = [f5 n]
+
+gg1, gg2, gg3, gg4, gg5 :: Vertex -> GenClos
+gg1 n = GenClos ("g1", n, (g1 n))
+gg2 n = GenClos ("g2", n, (g2 n))
+gg3 n = GenClos ("g3", n, (g3 n))
+gg4 n = GenClos ("g4", n, (g4 n))
+gg5 n = GenClos ("g5", n, (g5 n))
 
 g12 n = g1 n ++ g2 n
 g13 n = g1 n ++ g3 n
@@ -76,6 +102,15 @@ g34 n = g3 n ++ g4 n
 g35 n = g3 n ++ g5 n
 g45 n = g4 n ++ g5 n
 
+gg12, gg13, gg14, gg15, gg23, gg24, gg24 :: Vertex -> GenClos
+gg12 n = GenClos ("g12", n, (g12 n))
+gg13 n = GenClos ("g13", n, (g13 n))
+gg14 n = GenClos ("g14", n, (g14 n))
+gg15 n = GenClos ("g15", n, (g15 n))
+gg23 n = GenClos ("g23", n, (g23 n))
+gg24 n = GenClos ("g24", n, (g24 n))
+gg25 n = GenClos ("g25", n, (g25 n))
+
 g123 n = g12 n ++ g3 n
 g124 n = g12 n ++ g4 n
 g125 n = g12 n ++ g5 n
@@ -87,13 +122,35 @@ g235 n = g23 n ++ g5 n
 g245 n = g24 n ++ g5 n
 g345 n = g34 n ++ g5 n
 
+gg123, gg124, gg125, gg134, gg135, gg145, gg234, gg235, gg245, gg345 :: Vertex -> GenClos
+gg123 n = GenClos ("g123", n, (g123 n))
+gg124 n = GenClos ("g124", n, (g124 n))
+gg125 n = GenClos ("g125", n, (g125 n))
+gg134 n = GenClos ("g134", n, (g134 n))
+gg135 n = GenClos ("g135", n, (g135 n))
+gg145 n = GenClos ("g145", n, (g145 n))
+gg234 n = GenClos ("g234", n, (g234 n))
+gg235 n = GenClos ("g235", n, (g235 n))
+gg245 n = GenClos ("g245", n, (g245 n))
+gg345 n = GenClos ("g345", n, (g345 n))
+
 g1234 n = g123 n ++ g4 n
 g1235 n = g123 n ++ g5 n
 g1245 n = g124 n ++ g5 n
 g1345 n = g134 n ++ g5 n
 g2345 n = g234 n ++ g5 n
 
+gg1234, gg1235, gg1245, gg1345, gg2345 :: Vertex -> GenClos
+gg1234 n = GenClos ("g1234", n, (g1234 n))
+gg1235 n = GenClos ("g1235", n, (g1235 n))
+gg1245 n = GenClos ("g1245", n, (g1245 n))
+gg1345 n = GenClos ("g1345", n, (g1345 n))
+gg2345 n = GenClos ("g2345", n, (g2345 n))
+
 g12345 n = g1234 n ++ g5 n
+
+gg12345 :: Vertex -> GenClos
+gg12345 n = GenClos ("g12345", n, (g12345 n))
 
 dispatcher :: String -> Int -> [Int -> Int]
 dispatcher "g" = g

@@ -25,9 +25,9 @@ module Table( -- Types
             ) where
 
 import           Data.Array (Array, elems, listArray, (!), (//))
+import           Utils (Vertex)
 
 type Freq   = [Int]
-type Vertex = Int
 type VTable = Array Int [Vertex]
 type TableStats  = [(String, String)]
 

@@ -1,10 +1,9 @@
-{-# LANGUAGE TemplateHaskell, DeriveDataTypeable #-}
+{-# LANGUAGE TemplateHaskell #-}
 --
 -- orbit-int master (controlling orbit computation)
 --
 module MasterWorker( -- Master
-                     GenClos
-                   , HostInfo (..)
+                     HostInfo (..)
                    , MasterStats
                    , MaybeHosts(..)
                    , orbit
@@ -26,27 +25,15 @@ module MasterWorker( -- Master
 
 import           Control.Distributed.Process
 import           Control.Distributed.Process.Closure
-import           Data.Binary
 import           Data.Hashable                              (hash)
 import           Data.Maybe                                 (fromJust)
-import           Data.Typeable
 import           Prelude                             hiding (init)
 
 import           Credit
-import qualified Sequential                          as Sq  (Generator, orbit)
+import qualified Sequential                          as Sq  (orbit)
 import           Table
-import           Utils                                      (dispatcher, now)
-
--- Trying to serialize ParConf closures...
-newtype GenClos = GenClos (String, Int, [Sq.Generator])
-    deriving (Typeable)
-
-instance Show GenClos where
-    showsPrec p (GenClos (name, _, _)) = (name ++)
-
-instance Binary GenClos where
-    put (GenClos (name, n, _)) = put (name, n)
-    get = get >>= \(name, n) -> return $ GenClos (name, n, dispatcher name n)
+import           Utils                                      (GenClos (..), Generator,
+                                                             dispatcher, now)
 
 -- counters/timers record
 data Ct = Ct { verts_recvd :: Int    -- #vertices received by this server so far
@@ -281,7 +268,7 @@ distribute_vetices staticMachConf credit (x : xs) = do
 
 -- send_image sends image of X under G to the worker determined by
 -- the hash of G(X); the message is tagged with atomic credit K.
-send_image :: ParConf -> Vertex -> Sq.Generator -> ACredit -> Process ()
+send_image :: ParConf -> Vertex -> Generator -> ACredit -> Process ()
 send_image staticMachConf x g k = send_vertex staticMachConf (g x) k
 
 -- send_vertex hashes vertex X and sends it to the worker determined by

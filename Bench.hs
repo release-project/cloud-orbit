@@ -6,14 +6,13 @@ module Bench( -- sequential benchmarks
             , dist, dist_seq
             ) where
 
-import Control.Distributed.Process        (Process, NodeId)
+import Control.Distributed.Process
 import Data.List                          (lookup)
 import Data.Maybe                         (fromMaybe)
 import Prelude                     hiding (seq)
 
-import MasterWorker                       (HostInfo(..), MaybeHosts(..),
-                                           GenClos, MasterStats, orbit)
-import Table                              (Vertex)
+import MasterWorker                       (HostInfo(..), MaybeHosts(..), 
+                                           MasterStats, orbit)
 import Utils
 
 -----------------------------------------------------------------------------
@@ -23,32 +22,32 @@ import Utils
 -- * number of processors P > 0 (per node)
 -- * list of Workers (in short node name format 'name@host')
 -- sequential orbit computation
-seq :: (Int -> GenClos) -> Int -> Process String
+seq :: (Vertex -> GenClos) -> Vertex -> Process String
 seq generators n =
     orbit (generators n) [0] (Seq (2 * n)) >>= return . sz . snd
 
 -- parallel orbit computation (par_seq/3 does not spawn image computation)
-par :: (Int -> GenClos) -> Int -> Int -> Process String
+par :: (Vertex -> GenClos) -> Vertex -> Int -> Process String
 par generators n p =
      orbit (generators n) [0]
        (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, True)))
        >>= return . sz . snd
 
-par_seq :: (Int -> GenClos) -> Int -> Int -> Process String
+par_seq :: (Vertex -> GenClos) -> Vertex -> Int -> Process String
 par_seq generators n p =
     orbit (generators n) [0]
       (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, False)))
       >>= return . sz . snd
 
 -- distributed orbit computation (dist_seq/4 does not spawn image computation)
-dist :: (Int -> GenClos) -> Int -> Int -> [NodeId] -> Process String
+dist :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
 dist generators n p workers =
     orbit (generators n) [0]
       (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, True) | h <- workers]))
       >>= return . sz . snd
   where w = length workers
 
-dist_seq :: (Int -> GenClos) -> Int -> Int -> [NodeId] -> Process String
+dist_seq :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
 dist_seq generators n p workers =
     orbit (generators n) [0]
       (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, False) | h <- workers]))
