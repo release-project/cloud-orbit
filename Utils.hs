@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Utils where
 
-import           Data.Binary
-import           Data.Typeable
+import Data.Binary
+import Data.Typeable
 
 -- Trying to serialize ParConf closures...
 newtype GenClos = GenClos (String, Int, [Generator])
@@ -102,7 +102,7 @@ g34 n = g3 n ++ g4 n
 g35 n = g3 n ++ g5 n
 g45 n = g4 n ++ g5 n
 
-gg12, gg13, gg14, gg15, gg23, gg24, gg24 :: Vertex -> GenClos
+gg12, gg13, gg14, gg15, gg23, gg24, gg25 :: Vertex -> GenClos
 gg12 n = GenClos ("g12", n, (g12 n))
 gg13 n = GenClos ("g13", n, (g13 n))
 gg14 n = GenClos ("g14", n, (g14 n))
@@ -122,7 +122,8 @@ g235 n = g23 n ++ g5 n
 g245 n = g24 n ++ g5 n
 g345 n = g34 n ++ g5 n
 
-gg123, gg124, gg125, gg134, gg135, gg145, gg234, gg235, gg245, gg345 :: Vertex -> GenClos
+gg123, gg124, gg125, gg134, gg135, gg145, gg234, gg235, gg245, gg345
+  :: Vertex -> GenClos
 gg123 n = GenClos ("g123", n, (g123 n))
 gg124 n = GenClos ("g124", n, (g124 n))
 gg125 n = GenClos ("g125", n, (g125 n))
