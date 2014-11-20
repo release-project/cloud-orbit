@@ -410,11 +410,12 @@ remotable ['init]
 orbit :: GenClos -> [Vertex] -> MaybeHosts -> Process ([Vertex], [MasterStats])
 orbit (GenClos (_, _, gs)) xs (Seq tablesize) =
     return $ Sq.orbit gs xs tablesize
-orbit gs xs (Par hostInfo)  = par_orbit gs xs hostInfo
+orbit gs xs (Par hostInfo) = par_orbit gs xs hostInfo
 
 par_orbit :: GenClos -> [Vertex] -> HostInfo
              -> Process ([Vertex], [MasterStats])
 par_orbit gs xs hosts = do
+    say "---- in par_orbit"
     -- spawn workers on Hosts
     (workers, globTabSize) <- start_workers hosts
     self <- getSelfPid
@@ -445,7 +446,9 @@ par_orbit gs xs hosts = do
 -- * Workers is a list of Worker, sorted wrt. TableOffset in ascending order.
 start_workers :: HostInfo -> Process ([(ProcessId, Int, Int)], Int)
 start_workers (JustOne host) = do
+    say "---- in start_workers"
     (workers, globalTableSize) <- do_start_shm host ([], 0)
+    say "---- after do_start_shm"
     return (reverse workers, globalTableSize)
 start_workers (Many hosts) = do
     (workers, globalTableSize) <- do_start_dist hosts ([], 0)
@@ -455,8 +458,10 @@ do_start_shm :: (Int, Int, Int, Bool) -> ([(ProcessId, Int, Int)], Int)
                 -> Process ([(ProcessId, Int, Int)], Int)
 do_start_shm (0, _, _, _) acc = return acc
 do_start_shm (m, tabSize, tmOut, spawnImgComp) (workers, gTabSize) = do
-    selfNode <- getSelfNode
-    pid <- spawnLink selfNode ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    node <- getSelfNode
+    say $ "---- i got a node id " ++ show m ++ " " ++ show tabSize ++ " " ++ show tmOut ++ " " ++ show workers
+    pid <- spawnLink node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    say "---- after spawnLink"
     do_start_shm (m - 1, tabSize, tmOut, spawnImgComp)
       ((pid, gTabSize, tabSize) : workers, gTabSize + tabSize)
 
