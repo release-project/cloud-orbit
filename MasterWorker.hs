@@ -161,7 +161,7 @@ vertex_server staticMachConf crdt table statData = do
     let idleTimeout = get_idle_timeout staticMachConf
     r <- receiveTimeout idleTimeout [
         match $ \("vertex", x, slot, k) -> do
-            say $ "Got a vertex!"
+            -- say $ "Got a vertex!"
             let creditPlusK = credit_atomic k crdt
                 nowTime = now
                 vertsRecvd = verts_recvd statData
@@ -263,7 +263,7 @@ distribute_vertices :: ParConf -> Credit -> Credit -> Process Credit
 distribute_vertices _ crdt [] = return crdt
 distribute_vertices staticMachConf crdt [x] = do
     let (k, remainingCredit) = debit_atomic crdt
-    say $ "Remaining credit = " ++ show remainingCredit ++ " k = " ++ show k
+    -- say $ "Remaining credit = " ++ show remainingCredit ++ " k = " ++ show k
     send_vertex staticMachConf x k
     return remainingCredit
 distribute_vertices staticMachConf crdt (x : xs) = do
@@ -279,9 +279,9 @@ send_image staticMachConf x g k = send_vertex staticMachConf (g x) k
 -- send_vertex hashes vertex X and sends it to the worker determined by
 -- the hash; the message is tagged with atomic credit K.
 send_vertex :: ParConf -> Vertex -> ACredit -> Process ()
-send_vertex staticMachConf x k = do {say $ "Send vertex " ++ show x ++ " to " ++ show pid ++ " (slot, k) = " ++ show (slot, k);
+send_vertex staticMachConf x k = do
+    say $ "Send vertex " ++ show x ++ " to " ++ show pid ++ " (slot, k) = " ++ show (slot, k)
     send pid ("vertex", x, slot, k)
-}
   where (pid, slot) = hash_vertex staticMachConf x
 
 -- hash_vertex computes the two-dimensional hash table slot of vertex X where
@@ -423,7 +423,7 @@ orbit gs xs (Par hostInfo) = par_orbit gs xs hostInfo
 par_orbit :: GenClos -> [Vertex] -> HostInfo
              -> Process ([Vertex], [MasterStats])
 par_orbit gs xs hosts = do
-    say "---- In par_orbit"
+    -- say "---- In par_orbit"
     -- spawn workers on Hosts
     (workers, globTabSize) <- start_workers hosts
     self <- getSelfPid
@@ -433,12 +433,12 @@ par_orbit gs xs hosts = do
     let -- start wall clock timer
         startTime = now
     -- distribute initial vertices to workers
-    say $ "---- After send pid init, xs = " ++ show xs
+    -- say $ "---- After send pid init, xs = " ++ show xs
     crdt <- distribute_vertices staticMachConf one xs
-    say $ "---- After distribute_vertices, credit = " ++ show crdt
+    -- say $ "---- After distribute_vertices, credit = " ++ show crdt
     -- collect credit handed back by idle workers
     collect_credit crdt
-    say "---- After collect credit"
+    -- say "---- After collect credit"
     -- collect credit handed back by idle workers
     let -- measure elapsed time (in milliseconds)
         elapsedTime = now - startTime
@@ -458,14 +458,14 @@ par_orbit gs xs hosts = do
 -- * Workers is a list of Worker, sorted wrt. TableOffset in ascending order.
 start_workers :: HostInfo -> Process ([(ProcessId, Int, Int)], Int)
 start_workers (JustOne host) = do
-    say "---- In start_workers"
+    -- say "---- In start_workers"
     (workers, globalTableSize) <- do_start_shm host ([], 0)
-    say "---- After do_start_shm"
+    -- say "---- After do_start_shm"
     return (reverse workers, globalTableSize)
 start_workers (Many hosts) = do
-    say "---- In many start_workers"
+    -- say "---- In many start_workers"
     (workers, globalTableSize) <- do_start_dist hosts ([], 0)
-    say $ "---- After do_start_dist, Workers = " ++ show workers
+    -- say $ "---- After do_start_dist, Workers = " ++ show workers
     return (reverse workers, globalTableSize)
 
 do_start_shm :: (Int, Int, Int, Bool) -> ([(ProcessId, Int, Int)], Int)
