@@ -43,14 +43,14 @@ par_seq generators n p =
 dist :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
 dist generators n p workers =
     orbit (generators n) [0]
-      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, True) | h <- workers]))
+      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 0, True) | h <- workers]))
       >>= return . sz . snd
   where w = length workers
 
 dist_seq :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
 dist_seq generators n p workers =
     orbit (generators n) [0]
-      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 1, False) | h <- workers]))
+      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 0, False) | h <- workers]))
       >>= return . sz . snd
   where w = length workers
 
