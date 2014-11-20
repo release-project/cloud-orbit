@@ -1,7 +1,7 @@
 .PHONY: FORCE clean distclean
 
 orbit: FORCE
-		ghc -Wall --make Bench.hs -o orbit
+		ghc -Wall --make Bench.hs -main-is Bench -o orbit
 
 tests: orbit
 	        ghc -package test-framework -package test-framework-hunit \
