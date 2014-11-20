@@ -9,9 +9,8 @@ module Bench( -- sequential benchmarks
 
 import           Control.Distributed.Process
 import           Control.Distributed.Process.Node
-import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
-import           Prelude                                            hiding (seq)
-import           System.Environment                                        (getArgs)
+import           Prelude                          hiding (seq)
+import           Network.Transport.TCP
 
 import           MasterWorker
 import           Utils
@@ -62,11 +61,26 @@ sz (mainStats : _) =
         Nothing -> "false"
         Just s  -> "{size," ++ s ++ "}"
 
-rtable :: RemoteTable
-rtable = MasterWorker.__remoteTable initRemoteTable
-
 main :: IO ()
 main = do
+    Right t1 <- createTransport "127.0.0.1" "5050" defaultTCPParameters
+    node1 <- newLocalNode t1 rtable
+
+    Right t2 <- createTransport "127.0.0.1" "5051" defaultTCPParameters
+    node2 <- newLocalNode t2 rtable
+
+    Right t3 <- createTransport "127.0.0.1" "5052" defaultTCPParameters
+    node3 <- newLocalNode t3 rtable
+
+    runProcess node1 $ do
+        res <- dist gg13 11 2 [localNodeId node1, localNodeId node2, localNodeId node3]
+        liftIO $ print res
+  where rtable :: RemoteTable
+        rtable = MasterWorker.__remoteTable initRemoteTable
+{-
+import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
+import           System.Environment                                        (getArgs)
+
     args <- getArgs
 
     case args of
@@ -81,7 +95,7 @@ main = do
             b <- SLN.initializeBackend host port rtable
             print $ "Starting slave @ " ++ host ++ ":" ++ port
             SLN.startSlave b
-
+-}
     -- 1 second wait. Otherwise the main thread can terminate before
     -- our messages reach the logging process or get flushed to stdio
     --threadDelay (1 * 1000000)
