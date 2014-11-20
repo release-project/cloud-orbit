@@ -9,7 +9,7 @@ newtype GenClos = GenClos (String, Int, [Generator])
     deriving (Typeable)
 
 instance Show GenClos where
-    showsPrec p (GenClos (name, _, _)) = (name ++)
+    showsPrec _ (GenClos (name, _, _)) = (name ++)
 
 instance Binary GenClos where
     put (GenClos (name, n, _)) = put (name, n)
@@ -68,6 +68,7 @@ r r0 n = (abs n) `rem` r0
 -- f3 = fib(10..25),
 -- f4 = fib(11,19,27), bias 49- to 11, 49- to 19, 2- to 27
 -- f5 = fib(10,20,30), bias 90- to 10, 9.9- to 20, 0.1- to 30
+f1, f2, f3, f4, f5 :: Int -> Int -> Int
 f1 n x = r n $ (fib (p3 1 0 (r 16 x))) + p3 1 0 x
 f2 n x = r n $ (fib (p3 1 5 (r 16 x))) + p4 2 5 (-1) x
 f3 n x = r n $ (fib (p3 1 10 (r 16 x))) + p5 (-1) 0 8 0 x
@@ -75,9 +76,13 @@ f4 n x = r n $ (fib (p3 8 3 (s5 0 49 98 100 (r 100 x)))) + p2 (-1) x
 f5 n x = r n $ (fib (p3 10 0 (s5 0 900 999 1000 (r 1000 x)))) + p2 1 x
 
 -- sets (= lists) of generators
+g :: Vertex -> [Generator]
 g _ = []
+
+gg :: Vertex -> GenClos
 gg n = GenClos ("g", n, (g n))
 
+g1, g2, g3, g4, g5 :: Vertex -> [Generator]
 g1 n = [f1 n]
 g2 n = [f2 n]
 g3 n = [f3 n]
@@ -91,6 +96,7 @@ gg3 n = GenClos ("g3", n, (g3 n))
 gg4 n = GenClos ("g4", n, (g4 n))
 gg5 n = GenClos ("g5", n, (g5 n))
 
+g12, g13, g14, g15, g23, g24, g25, g34, g35, g45 :: Vertex -> [Generator]
 g12 n = g1 n ++ g2 n
 g13 n = g1 n ++ g3 n
 g14 n = g1 n ++ g4 n
@@ -102,7 +108,7 @@ g34 n = g3 n ++ g4 n
 g35 n = g3 n ++ g5 n
 g45 n = g4 n ++ g5 n
 
-gg12, gg13, gg14, gg15, gg23, gg24, gg25 :: Vertex -> GenClos
+gg12, gg13, gg14, gg15, gg23, gg24, gg25, gg34, gg35, gg45 :: Vertex -> GenClos
 gg12 n = GenClos ("g12", n, (g12 n))
 gg13 n = GenClos ("g13", n, (g13 n))
 gg14 n = GenClos ("g14", n, (g14 n))
@@ -110,7 +116,12 @@ gg15 n = GenClos ("g15", n, (g15 n))
 gg23 n = GenClos ("g23", n, (g23 n))
 gg24 n = GenClos ("g24", n, (g24 n))
 gg25 n = GenClos ("g25", n, (g25 n))
+gg34 n = GenClos ("g34", n, (g34 n))
+gg35 n = GenClos ("g35", n, (g35 n))
+gg45 n = GenClos ("g45", n, (g45 n))
 
+g123, g124, g125, g134, g135, g145, g234, g235, g245, g345
+  :: Vertex -> [Generator]
 g123 n = g12 n ++ g3 n
 g124 n = g12 n ++ g4 n
 g125 n = g12 n ++ g5 n
@@ -135,6 +146,7 @@ gg235 n = GenClos ("g235", n, (g235 n))
 gg245 n = GenClos ("g245", n, (g245 n))
 gg345 n = GenClos ("g345", n, (g345 n))
 
+g1234, g1235, g1245, g1345, g2345 :: Vertex -> [Generator]
 g1234 n = g123 n ++ g4 n
 g1235 n = g123 n ++ g5 n
 g1245 n = g124 n ++ g5 n
@@ -148,6 +160,7 @@ gg1245 n = GenClos ("g1245", n, (g1245 n))
 gg1345 n = GenClos ("g1345", n, (g1345 n))
 gg2345 n = GenClos ("g2345", n, (g2345 n))
 
+g12345 :: Vertex -> [Generator]
 g12345 n = g1234 n ++ g5 n
 
 gg12345 :: Vertex -> GenClos

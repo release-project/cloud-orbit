@@ -32,7 +32,7 @@ type SeqStats = [(String, String)]
 -- The function returns a pair consisting of the computed orbit and a singleton
 -- list of statistics (mainly runtime and fill degree of the table).
 orbit :: [Generator] -> [Vertex] -> Int -> ([Vertex],  [SeqStats])
-orbit gs xs tableSize = (orbit, [stat])
+orbit gs xs tableSize = (to_list finalTable, [stat])
   where -- assemble static configuration
         staticMachConf = mk_static_mach_conf gs tableSize
         -- initialise hash table and work queue
@@ -45,7 +45,6 @@ orbit gs xs tableSize = (orbit, [stat])
         -- measure elapsed time (in milliseconds)
         elapsedTime = now - startTime
         -- return result
-        orbit = to_list finalTable
         stat = seq_stats elapsedTime (get_freq finalTable) vertsRecvd
 
 -- main loop working off work Queue;

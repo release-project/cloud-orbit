@@ -32,8 +32,9 @@ import           Prelude                             hiding (init)
 import           Credit
 import qualified Sequential                          as Sq  (orbit)
 import           Table
-import           Utils                                      (GenClos (..), Generator,
-                                                             dispatcher, now)
+import           Utils                                      (GenClos (..),
+                                                             Generator,
+                                                             now)
 
 -- counters/timers record
 data Ct = Ct { verts_recvd :: Int    -- #vertices received by this server so far
@@ -93,11 +94,11 @@ get_spawn_img_comp (_, _, _, _, _, spawmImgComp) = spawmImgComp
 
 
 set_idle_timeout :: ParConf -> Int -> ParConf
-set_idle_timeout (gs, mst, wks, gts, timeout, spic) x =
+set_idle_timeout (gs, mst, wks, gts, _, spic) x =
     (gs, mst, wks, gts, x, spic)
 
 clear_spawn_img_comp :: ParConf -> ParConf
-clear_spawn_img_comp (gs, mst, wks, gts, tmt, spawmImgComp) =
+clear_spawn_img_comp (gs, mst, wks, gts, tmt, _) =
     (gs, mst, wks, gts, tmt, False)
 
 -- produce readable statistics
@@ -155,11 +156,12 @@ init (localTableSize, idleTimeout, spawnImgComp) =
 -- Table: hash table holding vertices
 -- StatData: various counters and timers for gathering statistics
 vertex_server :: ParConf -> Credit -> VTable -> Ct -> Process ()
-vertex_server staticMachConf credit table statData = do
+vertex_server staticMachConf crdt table statData = do
     let idleTimeout = get_idle_timeout staticMachConf
     r <- receiveTimeout idleTimeout [
         match $ \("vertex", x, slot, k) -> do
-            let creditPlusK = credit_atomic k credit
+            say $ "got a vertex!"
+            let creditPlusK = credit_atomic k crdt
                 nowTime = now
                 vertsRecvd = verts_recvd statData
                 minAtomicCredit = min_atomic_credit statData
@@ -185,7 +187,7 @@ vertex_server staticMachConf credit table statData = do
       ]
     case r of
         Nothing -> do let creditRetd = credit_retd statData
-                      newCreditRetd <- return_credit staticMachConf credit creditRetd
+                      newCreditRetd <- return_credit staticMachConf crdt creditRetd
                       let newStatData = statData {credit_retd = newCreditRetd}
                       vertex_server staticMachConf zero table newStatData
         Just _  -> return ()
@@ -196,24 +198,24 @@ vertex_server staticMachConf credit table statData = do
 -- Precondition: Credit is non-zero.
 handle_vertex :: ParConf -> Vertex -> Int -> Credit -> VTable
                  -> Process (Credit, VTable)
-handle_vertex staticMachConf x slot credit table
-    | is_member x slot table = return (credit, table) -- x already in table;
-                                                      -- do nothing
+handle_vertex staticMachConf x slot crdt table
+    | is_member x slot table = return (crdt, table) -- x already in table;
+                                                    -- do nothing
     | otherwise = do -- x not in table
         let newTable = insert x slot table -- insert x at slot
         -- distribute images of x under generators to their respective workers
-        newCredit <- distribute_images staticMachConf x credit
+        newCredit <- distribute_images staticMachConf x crdt
         -- return remaining credit and updated table
         return (newCredit, newTable)
 
 -- return_credit sends non-zero Credit back to the master;
 -- returns number of times credit has been returned so far
 return_credit :: ParConf -> Credit -> Int -> Process Int
-return_credit staticMachConf credit creditRetd
-    | is_zero credit = return creditRetd
+return_credit staticMachConf crdt creditRetd
+    | is_zero crdt = return creditRetd
     | otherwise      = do
          let masterPid = get_master staticMachConf
-         send masterPid ("done", credit)
+         send masterPid ("done", crdt)
          return (creditRetd + 1)
 
 -- dump_table sends a list containing the local partial orbit to the master,
@@ -231,38 +233,40 @@ dump_table staticMachConf table statData = do
 -- computation and sending of vertices is actually done asynchronously.
 -- Precondition: Credit is non-zero.
 distribute_images :: ParConf -> Vertex -> Credit -> Process Credit
-distribute_images staticMachConf x credit =
-    do_distribute_images staticMachConf x credit (get_gens staticMachConf)
+distribute_images staticMachConf x crdt =
+    do_distribute_images staticMachConf x crdt (get_gens staticMachConf)
 
 do_distribute_images :: ParConf -> Vertex -> Credit -> GenClos
                         -> Process Credit
-do_distribute_images _ _ credit (GenClos (_, _, [])) =
-    return credit
-do_distribute_images staticMachConf x credit (GenClos (_, _, [g])) = do
-    let (k, remainingCredit) = debit_atomic credit
+do_distribute_images _ _ crdt (GenClos (_, _, [])) =
+    return crdt
+do_distribute_images staticMachConf x crdt (GenClos (_, _, [g])) = do
+    let (k, remainingCredit) = debit_atomic crdt
     if get_spawn_img_comp staticMachConf
         then spawnLocal (send_image staticMachConf x g k) >> return ()
         else send_image staticMachConf x g k
     return remainingCredit
-do_distribute_images staticMachConf x credit (GenClos (_, _, g : gs)) = do
-    let (k, nonZeroRemainingCredit) = debit_atomic_nz credit
+do_distribute_images staticMachConf x crdt (GenClos (name, n, g : gs)) = do
+    let (k, nonZeroRemainingCredit) = debit_atomic_nz crdt
     if get_spawn_img_comp staticMachConf
         then spawnLocal (send_image staticMachConf x g k) >> return ()
         else send_image staticMachConf x g k
-    return nonZeroRemainingCredit
+    do_distribute_images staticMachConf x nonZeroRemainingCredit
+      (GenClos (name, n, gs))
 
 -- distribute_vertices distributes the list of vertices Xs to the workers
 -- determined by the hash; some ore all of of the Credit is used to send
 -- the messages, the remaining credit is returned.
 -- Precondition: If Xs is non-empty then Credit must be non-zero.
 distribute_vertices :: ParConf -> Credit -> Credit -> Process Credit
-distribute_vertices _ credit [] = return credit
-distribute_vertices staticMachConf credit [x] = do
-    let (k, remainingCredit) = debit_atomic credit
+distribute_vertices _ crdt [] = return crdt
+distribute_vertices staticMachConf crdt [x] = do
+    let (k, remainingCredit) = debit_atomic crdt
+    say $ "remaining credit = " ++ show remainingCredit ++ " k = " ++ show k
     send_vertex staticMachConf x k
     return remainingCredit
-distribute_vetices staticMachConf credit (x : xs) = do
-    let (k, nonZeroRemainingCredit) = debit_atomic_nz credit
+distribute_vertices staticMachConf crdt (x : xs) = do
+    let (k, nonZeroRemainingCredit) = debit_atomic_nz crdt
     send_vertex staticMachConf x k
     distribute_vertices staticMachConf nonZeroRemainingCredit xs
 
@@ -274,7 +278,7 @@ send_image staticMachConf x g k = send_vertex staticMachConf (g x) k
 -- send_vertex hashes vertex X and sends it to the worker determined by
 -- the hash; the message is tagged with atomic credit K.
 send_vertex :: ParConf -> Vertex -> ACredit -> Process ()
-send_vertex staticMachConf x k = send pid ("vertex", x, slot, k)
+send_vertex staticMachConf x k = do {say $ "send to " ++ show (x, slot, k); send pid ("vertex", x, slot, k) }
   where (pid, slot) = hash_vertex staticMachConf x
 
 -- hash_vertex computes the two-dimensional hash table slot of vertex X where
@@ -422,12 +426,16 @@ par_orbit gs xs hosts = do
     let -- assemble StaticMachConf and distribute to Workers
         staticMachConf = mk_static_mach_conf gs self workers globTabSize
     mapM_ (\(pid, _, _) -> send pid ("init", staticMachConf)) workers
+    say $ "---- after send pid init, xs = " ++ show xs
     let -- start wall clock timer
         startTime = now
     -- distribute initial vertices to workers
-    credit <- distribute_vertices staticMachConf one xs
+    crdt <- distribute_vertices staticMachConf one xs
+    say $ "---- after distribute_vertices, credit = " ++ show crdt
     -- collect credit handed back by idle workers
-    collect_credit credit
+    collect_credit crdt
+    say "---- after collect credit"
+    -- collect credit handed back by idle workers
     let -- measure elapsed time (in milliseconds)
         elapsedTime = now - startTime
     -- tell all workers to dump their tables
@@ -487,8 +495,8 @@ collect_credit crdt
 -- collect_orbit collects partial orbits and stats from N workers.
 collect_orbit :: Int -> Int -> Process ([Vertex], [MasterStats])
 collect_orbit elapsedTime n = do
-    (orbit, stats) <- do_collect_orbit n [] []
-    return (concat orbit, master_stats elapsedTime stats : stats)
+    (orb, stats) <- do_collect_orbit n [] []
+    return (concat orb, master_stats elapsedTime stats : stats)
 
 do_collect_orbit :: Int -> [[Vertex]] -> [WorkerStats]
                     -> Process ([[Vertex]], [WorkerStats])

@@ -10,8 +10,6 @@ module Bench( -- sequential benchmarks
 import Control.Concurrent                      (threadDelay)
 import Control.Distributed.Process
 import Control.Distributed.Process.Node
-import Data.List                               (lookup)
-import Data.Maybe                              (fromMaybe)
 import Prelude                          hiding (seq)
 import Network.Transport.TCP
 
@@ -59,6 +57,7 @@ dist_seq generators n p workers =
   where w = length workers
 
 sz :: [MasterStats] -> String
+sz [] = "false"
 sz (mainStats : _) =
     case "size" `lookup` mainStats of
         Nothing -> "false"
@@ -71,4 +70,4 @@ seqTest = do
     runProcess node $ do
         res <- par gg13 11 2
         liftIO $ print res
-    threadDelay (2 * 1000000)
+    threadDelay (1 * 1000000)
