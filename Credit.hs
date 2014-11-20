@@ -45,6 +45,7 @@ credit c1 c2 = foldl (flip credit_atomic) c2 c1
 -- represented by K' and C' equals the credit represented by C.
 -- Precondition: C must represent non-zero credit.
 debit_atomic :: Credit -> (ACredit, Credit)
+debit_atomic [] = error "Credit [] is not valid."
 debit_atomic (c : cs) = (c, cs) -- debit smallest unit of credit
 
 -- debit_atomic_nz(C) returns a pair {K',C'} where K' is an integer
@@ -53,6 +54,7 @@ debit_atomic (c : cs) = (c, cs) -- debit smallest unit of credit
 -- represented by K' and C' equals the credit represented by C.
 -- Precondition: C must represent non-zero credit.
 debit_atomic_nz :: Credit -> (ACredit, Credit)
+debit_atomic_nz [] = error "Credit [] is not valid."
 debit_atomic_nz [c] = (c + 1, [c + 1]) -- debit half the credit
 debit_atomic_nz (c : cs) = (c, cs) -- debit smallest unit of credit;
 -- case only applies if Cs non-empty

@@ -299,6 +299,7 @@ hash_vertex staticMachConf x = global_to_local_slot workers globalSlot
 -- Note: This procedure is horribly inefficient (linear in size of Workers);
 -- it should be log (size of Workers) at most.
 global_to_local_slot :: [(ProcessId, Int, Int)] -> Int -> (ProcessId, Int)
+global_to_local_slot [] _ = error "global_to_local_slot cannot work on [] workers."
 global_to_local_slot ((pid, _, tabSize) : workers) globSlot
     | globSlot < tabSize = (pid, globSlot)
     | otherwise = global_to_local_slot workers (globSlot - tabSize)
