@@ -4,18 +4,17 @@ module Bench( -- sequential benchmarks
             , par, par_seq
               -- distributed benhcmarks
             , dist, dist_seq
-            , seqTest
+            , main
             ) where
 
-import Control.Concurrent                      (threadDelay)
-import Control.Distributed.Process
-import Control.Distributed.Process.Node
-import Prelude                          hiding (seq)
-import Network.Transport.TCP
+import           Control.Distributed.Process
+import           Control.Distributed.Process.Node
+import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
+import           Prelude                                            hiding (seq)
+import           System.Environment                                        (getArgs)
 
-import MasterWorker                            (HostInfo(..), MaybeHosts(..),
-                                                MasterStats, orbit)
-import Utils
+import           MasterWorker
+import           Utils
 
 -----------------------------------------------------------------------------
 -- benchmarks, parametrised by
@@ -63,11 +62,26 @@ sz (mainStats : _) =
         Nothing -> "false"
         Just s  -> "{size," ++ s ++ "}"
 
-seqTest :: IO ()
-seqTest = do
-    Right t <- createTransport "127.0.0.1" "10504" defaultTCPParameters
-    node <- newLocalNode t initRemoteTable
-    runProcess node $ do
-        res <- par gg13 11 2
-        liftIO $ print res
-    threadDelay (1 * 1000000)
+rtable :: RemoteTable
+rtable = MasterWorker.__remoteTable initRemoteTable
+
+main :: IO ()
+main = do
+    args <- getArgs
+
+    case args of
+        ["master", host, port] -> do
+            b <- SLN.initializeBackend host port rtable
+            print $ "Starting master @ " ++ host ++ ":" ++ port ++ " with slaves:"
+            SLN.startMaster b $ \slaves -> do
+                liftIO $ print $ "  " ++ show slaves
+                res <- dist gg13 11 2 slaves
+                liftIO $ print res
+        ["slave", host, port] -> do
+            b <- SLN.initializeBackend host port rtable
+            print $ "Starting slave @ " ++ host ++ ":" ++ port
+            SLN.startSlave b
+
+    -- 1 second wait. Otherwise the main thread can terminate before
+    -- our messages reach the logging process or get flushed to stdio
+    --threadDelay (1 * 1000000)

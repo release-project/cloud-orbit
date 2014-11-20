@@ -21,6 +21,7 @@ module MasterWorker( -- Master
                    , tail_idle_from_stat
                    , max_idle_from_stat
                    , WorkerStats
+                   , __remoteTable
                    ) where
 
 import           Control.Distributed.Process
