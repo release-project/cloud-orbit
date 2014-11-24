@@ -65,15 +65,15 @@ main :: IO ()
 main = do
     Right t1 <- createTransport "127.0.0.1" "5050" defaultTCPParameters
     node1 <- newLocalNode t1 rtable
-
+{-
     Right t2 <- createTransport "127.0.0.1" "5051" defaultTCPParameters
     node2 <- newLocalNode t2 rtable
 
     Right t3 <- createTransport "127.0.0.1" "5052" defaultTCPParameters
     node3 <- newLocalNode t3 rtable
-
+-}
     runProcess node1 $ do
-        res <- dist gg13 11 2 [localNodeId node1, localNodeId node2, localNodeId node3]
+        res <- par_seq gg1245 2512 32 --[localNodeId node1, localNodeId node2, localNodeId node3]
         liftIO $ print res
   where rtable :: RemoteTable
         rtable = MasterWorker.__remoteTable initRemoteTable
