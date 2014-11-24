@@ -280,7 +280,7 @@ send_image staticMachConf x g k = send_vertex staticMachConf (g x) k
 -- the hash; the message is tagged with atomic credit K.
 send_vertex :: ParConf -> Vertex -> ACredit -> Process ()
 send_vertex staticMachConf x k = do
-    say $ "Send vertex " ++ show x ++ " to " ++ show pid ++ " (slot, k) = " ++ show (slot, k)
+    --say $ "Send vertex " ++ show x ++ " to " ++ show pid ++ " (slot, k) = " ++ show (slot, k)
     send pid ("vertex", x, slot, k)
   where (pid, slot) = hash_vertex staticMachConf x
 
