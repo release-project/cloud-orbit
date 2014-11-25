@@ -1,12 +1,14 @@
-import           Control.Concurrent.MVar               (MVar, putMVar, newEmptyMVar, takeMVar)
+import           Control.Concurrent.MVar               (MVar, putMVar,
+                                                        newEmptyMVar, takeMVar)
 import           Control.Distributed.Process
 import           Control.Distributed.Process.Node
 import qualified Network.Transport as NT               (Transport)
 import           Network.Transport.TCP
 import           Prelude                        hiding (seq)
-import           Test.Framework                        (Test, testGroup, defaultMain)
+import           Test.Framework                        (Test, testGroup,
+                                                        defaultMain)
 import           Test.Framework.Providers.HUnit        (testCase)
-import           Test.HUnit                            (Assertion, assertFailure)
+import           Test.HUnit                            (Assertion)
 import           Test.HUnit.Base                       (assertBool)
 
 import           Bench                                 (seq)
@@ -17,36 +19,30 @@ import           Utils
 
 testSeqShort :: TestResult String -> Process ()
 testSeqShort result = do
-  r <- seq gg13 11
-  stash result r
+    x <- seq gg13 11
+    stash result x
 
 testSeqIntermediate :: TestResult String -> Process ()
 testSeqIntermediate result = do
-  r <- seq gg124 157
-  stash result r
+    x <- seq gg124 157
+    stash result x
 
 testSeqLong :: TestResult String -> Process ()
 testSeqLong result = do
-  r <- seq gg1245 157
-  stash result r
+    x <- seq gg1245 157
+    stash result x
 
 -- Batch the tests
 
 tests :: LocalNode  -> [Test]
 tests localNode = [
     testGroup "Sequential Tests" [
-        testCase "testSeqShort"
-                 (delayedAssertion
-                  "short"
-                  localNode "{size,10}" testSeqShort)
-      , testCase "testSeqIntermediate"
-                 (delayedAssertion
-                  "intermediate"
-                  localNode "{size,133}" testSeqIntermediate)
-      , testCase "testSeqLong"
-                 (delayedAssertion
-                  "long"
-                  localNode "{size,134}" testSeqLong)
+          testCase "testSeqShort"
+            (delayedAssertion "short" localNode "{size,10}" testSeqShort)
+        , testCase "testSeqIntermediate"
+            (delayedAssertion "intermediate" localNode "{size,133}" testSeqIntermediate)
+        , testCase "testSeqLong"
+            (delayedAssertion "long" localNode "{size,134}" testSeqLong)
       ]
   ]
 
@@ -54,9 +50,9 @@ tests localNode = [
 
 orbitTests :: NT.Transport -> IO [Test]
 orbitTests transport = do
-  localNode <- newLocalNode transport rtable
-  let testData = tests localNode
-  return testData
+    localNode <- newLocalNode transport rtable
+    let testData = tests localNode
+    return testData
   where rtable :: RemoteTable
         rtable = MasterWorker.__remoteTable initRemoteTable
 
@@ -78,20 +74,20 @@ stash mvar x = liftIO $ putMVar mvar x
 delayedAssertion :: (Eq a) => String -> LocalNode -> a ->
                     (TestResult a -> Process ()) -> Assertion
 delayedAssertion note localNode expected testProc = do
-  result <- newEmptyMVar
-  _ <- forkProcess localNode $ testProc result
-  assertComplete note result expected
+    result <- newEmptyMVar
+    _ <- forkProcess localNode $ testProc result
+    assertComplete note result expected
 
 -- | Takes the value of @mv@ (using @takeMVar@) and asserts that it matches @a@
 assertComplete :: (Eq a) => String -> MVar a -> a -> IO ()
 assertComplete msg mv a = do
-  b <- takeMVar mv
-  assertBool msg (a == b)
+    b <- takeMVar mv
+    assertBool msg (a == b)
 
 -- | Given a @builder@ function, make and run a test suite on a single transport
 testMain :: (NT.Transport -> IO [Test]) -> IO ()
 testMain builder = do
-  Right (transport, _) <- createTransportExposeInternals
-                                    "127.0.0.1" "10501" defaultTCPParameters
-  testData <- builder transport
-  defaultMain testData
+    Right (transport, _) <-
+      createTransportExposeInternals "127.0.0.1" "10501" defaultTCPParameters
+    testData <- builder transport
+    defaultMain testData
