@@ -4,7 +4,7 @@ orbit: FORCE
 		ghc -Wall --make Bench.hs -main-is Bench -o orbit
 
 tests: orbit
-	        ghc -Wall -threaded Tests.hs -o OrbitTests
+	        ghc -Wall -rtsopts -threaded Tests.hs -o OrbitTests
 
 clean:
 		$(RM) *.swp *~ *.hi *.o
