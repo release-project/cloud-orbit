@@ -101,7 +101,8 @@ testDistSeqLong nodes result = do
 
 -- Batch the tests
 
-tests :: [LocalNode]  -> [Test]
+tests :: [LocalNode] -> [Test]
+tests [] = []
 tests (localNode : localNodes) = [
       testGroup "Sequential Tests" [
             testCase "testSeqShort"
