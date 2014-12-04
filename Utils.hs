@@ -203,4 +203,4 @@ dispatcher "g12345" = g12345
 -- current wall clock time (in milliseconds since start of RTS)
 -- FIXME: get current wall clock time (maybe with getCPUTime of System.CPUTime)
 now :: Int
-now = 42
+now = -1
