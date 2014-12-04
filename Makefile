@@ -3,7 +3,7 @@
 orbit: FORCE
 		ghc -Wall --make Bench.hs -main-is Bench -o orbit
 
-tests: orbit
+tests:
 	        ghc -Wall -rtsopts -threaded Tests.hs -o OrbitTests
 
 clean:
