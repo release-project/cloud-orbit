@@ -101,6 +101,7 @@ main = do
                 let bench = select_dist_bench iwp
                 liftIO $ print $ "  " ++ show slaves
                 res <- bench gnrt n (read w :: Int) slaves
+                SLN.terminateAllSlaves b
                 liftIO $ print res
         ["dist", "slave", host, port] -> do
             b <- SLN.initializeBackend host port rtable
