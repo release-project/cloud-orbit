@@ -8,7 +8,7 @@ module Bench( -- sequential benchmarks
             ) where
 
 import           Control.Distributed.Process
---import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
+import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
 import           Control.Distributed.Process.Node
 import           Prelude                                                    hiding (seq)
 import           Network.Transport.TCP
@@ -68,6 +68,11 @@ select_par_bench "True" = par
 select_par_bench "False" = par_seq
 select_par_bench _ = error "Invalid IWP Flag"
 
+select_dist_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
+select_dist_bench "True" = dist
+select_dist_bench "False" = dist_seq
+select_dist_bench _ = error "Invalid IWP Flag"
+
 bench_args :: String -> (Vertex -> GenClos, Int)
 bench_args "short" = (gg13, 11)
 bench_args "intermediate" = (gg124, 157)
@@ -87,10 +92,28 @@ main = do
                 let bench = select_par_bench iwp
                 res <- bench gnrt n (read w :: Int)
                 liftIO $ print res
+        -- Distributed Orbit
+        ["dist", "master", iwp, version, w, host, port] -> do
+            let (gnrt, n) = bench_args version
+            b <- SLN.initializeBackend host port rtable
+            print $ "Starting master @ " ++ host ++ ":" ++ port ++ " with slaves:"
+            SLN.startMaster b $ \slaves -> do
+                let bench = select_dist_bench iwp
+                liftIO $ print $ "  " ++ show slaves
+                res <- bench gnrt n (read w :: Int) slaves
+                liftIO $ print res
+        ["dist", "slave", host, port] -> do
+            b <- SLN.initializeBackend host port rtable
+            print $ "Starting slave @ " ++ host ++ ":" ++ port
+            SLN.startSlave b
         -- Invalid configuration
         _ -> do
             putStrLn "Paraller Version"
             putStrLn "Usage: ./orbit par [True|False] [short|intermediat|long] nWorkers host port"
+            putStrLn "Distributed Version [Master Node]"
+            putStrLn "Usage: ./orbit dist master [True|False] [short|intermediat|long] nWorkers host port"
+            putStrLn "Distributed Version [Slave Node]"
+            putStrLn "Usage: ./orbit dist slave host port"
     where rtable :: RemoteTable
           rtable = MasterWorker.__remoteTable initRemoteTable
 
