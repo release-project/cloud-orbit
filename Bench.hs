@@ -8,9 +8,11 @@ module Bench( -- sequential benchmarks
             ) where
 
 import           Control.Distributed.Process
+--import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
 import           Control.Distributed.Process.Node
-import           Prelude                          hiding (seq)
+import           Prelude                                                    hiding (seq)
 import           Network.Transport.TCP
+import           System.Environment                                                (getArgs)
 
 import           MasterWorker
 import           Utils
@@ -61,22 +63,56 @@ sz (mainStats : _) =
         Nothing -> "false"
         Just s  -> "{size," ++ s ++ "}"
 
+select_par_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> Process String
+select_par_bench "True" = par
+select_par_bench "False" = par_seq
+select_par_bench _ = error "Invalid IWP Flag"
+
+bench_args :: String -> (Vertex -> GenClos, Int)
+bench_args "short" = (gg13, 11)
+bench_args "intermediate" = (gg124, 157)
+bench_args "long" = (gg1245, 157)
+bench_args _ = error "Invalid Version"
+
+main :: IO ()
+main = do
+    args <- getArgs
+    case args of
+        -- Parallel Orbit
+        ["par", iwp, version, w, host, port] -> do
+            let (gnrt, n) = bench_args version
+            Right t <- createTransport host port defaultTCPParameters
+            node <- newLocalNode t rtable
+            runProcess node $ do
+                let bench = select_par_bench iwp
+                res <- bench gnrt n (read w :: Int)
+                liftIO $ print res
+        -- Invalid configuration
+        _ -> do
+            putStrLn "Paraller Version"
+            putStrLn "Usage: ./orbit par [True|False] [short|intermediat|long] nWorkers host port"
+    where rtable :: RemoteTable
+          rtable = MasterWorker.__remoteTable initRemoteTable
+
+{-
 main :: IO ()
 main = do
     Right t1 <- createTransport "127.0.0.1" "5050" defaultTCPParameters
     node1 <- newLocalNode t1 rtable
-{-
+
     Right t2 <- createTransport "127.0.0.1" "5051" defaultTCPParameters
     node2 <- newLocalNode t2 rtable
 
     Right t3 <- createTransport "127.0.0.1" "5052" defaultTCPParameters
     node3 <- newLocalNode t3 rtable
--}
+
     runProcess node1 $ do
         res <- par_seq gg1245 2512 32 --[localNodeId node1, localNodeId node2, localNodeId node3]
         liftIO $ print res
   where rtable :: RemoteTable
         rtable = MasterWorker.__remoteTable initRemoteTable
+-}
+
 {-
 import qualified Control.Distributed.Process.Backend.SimpleLocalnet as SLN
 import           System.Environment                                        (getArgs)
