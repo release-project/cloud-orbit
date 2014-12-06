@@ -22,29 +22,38 @@ def run_dist(master, slaves, version, workers, iwp):
 
 # Configuration
 
-reps = 1
+reps = 2
 iwp = False
 max_cpu = 32
 versions = ["short", "intermediate", "long"]
-master = {"host": "127.0.0.1", "port": 5055}
+master = {"host": "127.0.0.1", "port": 5050}
 slaves = [ {"host": "127.0.0.1", "port": 5051}
          , {"host": "127.0.0.1", "port": 5052}
          , {"host": "127.0.0.1", "port": 5053}
+         , {"host": "127.0.0.1", "port": 5054}
+         , {"host": "127.0.0.1", "port": 5055}
+         , {"host": "127.0.0.1", "port": 5056}
+         , {"host": "127.0.0.1", "port": 5057}
+         , {"host": "127.0.0.1", "port": 5058}
+         , {"host": "127.0.0.1", "port": 5059}
+         , {"host": "127.0.0.1", "port": 5060}
          ]
 
 f = open('statistics.txt', 'w')
 
-### 1 host, 1 slave node
-for iwp in [False, True]:
-  for vsn in versions:
-    for n in range(2, max_cpu+1):
-      slvs = slaves[0:1]
-      print ("Slaves: %s, Workers: %s, Version: %s, IWP: %s" % (slvs, n, vsn, iwp), file=f)
-      ts = []
-      for _ in range(reps):
-        t = run_dist(master, slvs, vsn, n, iwp)
-        ts.append(t)
-      print ("%s" % ts, file=f)
-      f.flush()
+### 1 host
+
+for nSlaves in range(1, len(slaves)+1):
+  for iwp in [False, True]:
+    for vsn in versions:
+      for n in range(2, max_cpu+1):
+        slvs = slaves[0:nSlaves]
+        print ("Slaves: %s, Workers: %s, Version: %s, IWP: %s" % (nSlaves, n, vsn, iwp), file=f)
+        ts = []
+        for _ in range(reps):
+          t = run_dist(master, slvs, vsn, n, iwp)
+          ts.append(t)
+        print ("%s" % ts, file=f)
+        f.flush()
 
 f.close()
