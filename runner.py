@@ -45,5 +45,6 @@ for iwp in [False, True]:
         t = run_dist(master, slvs, vsn, n, iwp)
         ts.append(t)
       print ("%s" % ts, file=f)
+      f.flush()
 
 f.close()
