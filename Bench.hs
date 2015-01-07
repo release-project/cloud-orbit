@@ -83,6 +83,14 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
+        -- Sequential Orbit
+        ["seq", version, host, port] -> do
+            let (gnrt, n) = bench_args version
+            Right t <- createTransport host port defaultTCPParameters
+            node <- newLocalNode t rtable
+            runProcess node $ do
+                res <- seq gnrt n
+                liftIO $ print res
         -- Parallel Orbit
         ["par", iwp, version, w, host, port] -> do
             let (gnrt, n) = bench_args version
@@ -109,10 +117,12 @@ main = do
             SLN.startSlave b
         -- Invalid configuration
         _ -> do
+            putStrLn "Sequential Version"
+            putStrLn "Usage: ./orbit seq [short|intermediate|long] host port"
             putStrLn "Paraller Version"
-            putStrLn "Usage: ./orbit par [True|False] [short|intermediat|long] nWorkers host port"
+            putStrLn "Usage: ./orbit par [True|False] [short|intermediate|long] nWorkers host port"
             putStrLn "Distributed Version [Master Node]"
-            putStrLn "Usage: ./orbit dist master [True|False] [short|intermediat|long] nWorkers host port"
+            putStrLn "Usage: ./orbit dist master [True|False] [short|intermediate|long] nWorkers host port"
             putStrLn "Distributed Version [Slave Node]"
             putStrLn "Usage: ./orbit dist slave host port"
     where rtable :: RemoteTable
