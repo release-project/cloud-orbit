@@ -4,8 +4,9 @@ module Bench( -- sequential benchmarks
             , par
               -- distributed benhcmarks
             , dist
+              -- miscellaneous
             , main
-            , sz
+            , getAnswer
             ) where
 
 import           Control.Distributed.Process
@@ -21,9 +22,15 @@ import           Utils
 type Result = ([Vertex], [MasterStats])
 --type Result = String
 
+-- | Gets the result of the calculation
 result :: ([Vertex], [MasterStats]) -> Result
 result = id
 --result = sz . snd
+
+-- | Gets the size (as a string) from the result
+getAnswer :: Result -> String
+getAnswer = sz . snd
+--getAnswer = id
 
 -----------------------------------------------------------------------------
 -- benchmarks, parametrised by
