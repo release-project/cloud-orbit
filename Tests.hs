@@ -13,8 +13,7 @@ import           Test.Framework.Providers.HUnit        (testCase)
 import           Test.HUnit                            (Assertion)
 import           Test.HUnit.Base                       (assertBool)
 
-import           Bench                                 (seq, par, par_seq,
-                                                        dist, dist_seq)
+import           Bench                                 (seq, par, dist, sz)
 import           MasterWorker                          (__remoteTable)
 import           Utils
 
@@ -23,81 +22,81 @@ import           Utils
 testSeqShort :: TestResult String -> Process ()
 testSeqShort result = do
     x <- seq gg13 11
-    stash result x
+    stash result (getRes x)
 
 testSeqIntermediate :: TestResult String -> Process ()
 testSeqIntermediate result = do
     x <- seq gg124 157
-    stash result x
+    stash result (getRes x)
 
 testSeqLong :: TestResult String -> Process ()
 testSeqLong result = do
     x <- seq gg1245 157
-    stash result x
+    stash result (getRes x)
 
 -- Parallel Tests
 
 testParShort :: TestResult String -> Process ()
 testParShort result = do
-    x <- par gg13 11 2
-    stash result x
+    x <- par True gg13 11 2
+    stash result (getRes x)
 
 testParIntermediate :: TestResult String -> Process ()
 testParIntermediate result = do
-    x <- par gg124 157 2
-    stash result x
+    x <- par True gg124 157 2
+    stash result (getRes x)
 
 testParLong :: TestResult String -> Process ()
 testParLong result = do
-    x <- par gg1245 157 2
-    stash result x
+    x <- par True gg1245 157 2
+    stash result (getRes x)
 
 testParSeqShort :: TestResult String -> Process ()
 testParSeqShort result = do
-    x <- par_seq gg13 11 2
-    stash result x
+    x <- par False gg13 11 2
+    stash result (getRes x)
 
 testParSeqIntermediate :: TestResult String -> Process ()
 testParSeqIntermediate result = do
-    x <- par_seq gg124 157 2
-    stash result x
+    x <- par False gg124 157 2
+    stash result (getRes x)
 
 testParSeqLong :: TestResult String -> Process ()
 testParSeqLong result = do
-    x <- par_seq gg1245 157 2
-    stash result x
+    x <- par False gg1245 157 2
+    stash result (getRes x)
 
 -- Distributed Tests
 
 testDistShort :: [NodeId] -> TestResult String -> Process ()
 testDistShort nodes result = do
-    x <- dist gg13 11 2 nodes
-    stash result x
+    x <- dist True gg13 11 2 nodes
+    stash result (getRes x)
 
 testDistIntermediate :: [NodeId] -> TestResult String -> Process ()
 testDistIntermediate nodes result = do
-    x <- dist gg124 157 2 nodes
-    stash result x
+    x <- dist True gg124 157 2 nodes
+    stash result (getRes x)
 
 testDistLong :: [NodeId] -> TestResult String -> Process ()
 testDistLong nodes result = do
-    x <- dist gg1245 157 2 nodes
-    stash result x
+    x <- dist True gg1245 157 2 nodes
+    stash result (getRes x)
 
 testDistSeqShort :: [NodeId] -> TestResult String -> Process ()
 testDistSeqShort nodes result = do
-    x <- dist_seq gg13 11 2 nodes
-    stash result x
+    x <- dist False gg13 11 2 nodes
+    stash result (getRes x)
 
 testDistSeqIntermediate :: [NodeId] -> TestResult String -> Process ()
 testDistSeqIntermediate nodes result = do
-    x <- dist_seq gg124 157 2 nodes
-    stash result x
+    x <- dist False gg124 157 2 nodes
+    stash result (getRes x)
 
 testDistSeqLong :: [NodeId] -> TestResult String -> Process ()
 testDistSeqLong nodes result = do
-    x <- dist_seq gg1245 157 2 nodes
-    stash result x
+    x <- dist False gg1245 157 2 nodes
+    stash result (getRes x)
 
 -- Batch the tests
 
@@ -165,6 +164,10 @@ main = testMain $ orbitTests
 
 -- Auxiliary functions
 -------------------------------------------------------------------
+
+-- | Gets the size from MasterStats.
+getRes = Result -> String
+getRes = sz . snd
 
 -- | A mutable cell containing a test result.
 type TestResult a = MVar a

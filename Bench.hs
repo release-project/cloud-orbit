@@ -5,6 +5,7 @@ module Bench( -- sequential benchmarks
               -- distributed benhcmarks
             , dist
             , main
+            , sz
             ) where
 
 import           Control.Distributed.Process
