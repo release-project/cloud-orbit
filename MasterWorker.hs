@@ -179,7 +179,7 @@ vertex_server staticMachConf crdt table statData = do
                         else newStatData0 {max_idle = max maxIdle (nowTime - lastEvent)}
                 newStatData = newStatData1 {last_event = now}
             vertex_server staticMachConf newCredit newTable newStatData
-      , match $ \"dump" -> do
+      , match $ \("dump") -> do
             let nowTime = now
                 lastEvent = last_event statData
                 newStatData = statData {tail_idle = nowTime - lastEvent,

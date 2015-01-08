@@ -1,9 +1,9 @@
 module Bench( -- sequential benchmarks
               seq
               -- parallel benchmarks
-            , par, par_seq
+            , par
               -- distributed benhcmarks
-            , dist, dist_seq
+            , dist
             , main
             ) where
 
@@ -17,6 +17,13 @@ import           System.Environment                                             
 import           MasterWorker
 import           Utils
 
+type Result = ([Vertex], [MasterStats])
+--type Result = String
+
+result :: ([Vertex], [MasterStats]) -> Result
+result = id
+--result = sz . snd
+
 -----------------------------------------------------------------------------
 -- benchmarks, parametrised by
 -- * list of Generators
@@ -24,36 +31,24 @@ import           Utils
 -- * number of processors P > 0 (per node)
 -- * list of Workers (in short node name format 'name@host')
 -- sequential orbit computation
-seq :: (Vertex -> GenClos) -> Vertex -> Process String
+seq :: (Vertex -> GenClos) -> Vertex -> Process Result
 seq generators n =
-    orbit (generators n) [0] (Seq (2 * n)) >>= return . sz . snd
+    orbit (generators n) [0] (Seq (2 * n))
+      >>= return . result
 
--- parallel orbit computation (par_seq/3 does not spawn image computation)
-par :: (Vertex -> GenClos) -> Vertex -> Int -> Process String
-par generators n p =
+-- parallel orbit computation (w/ False does not spawn image computation)
+par :: Bool -> (Vertex -> GenClos) -> Vertex -> Int -> Process Result
+par iwp generators n p =
      orbit (generators n) [0]
-       (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, True)))
-       >>= return . sz . snd
+       (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, iwp)))
+       >>= return . result
 
-par_seq :: (Vertex -> GenClos) -> Vertex -> Int -> Process String
-par_seq generators n p =
+-- distributed orbit computation (w/ False does not spawn image computation)
+dist :: Bool -> (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process Result
+dist iwp generators n p workers =
     orbit (generators n) [0]
-      (Par (JustOne (p, ((2 * n) `div` p) + 1, 0, False)))
-      >>= return . sz . snd
-
--- distributed orbit computation (dist_seq/4 does not spawn image computation)
-dist :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
-dist generators n p workers =
-    orbit (generators n) [0]
-      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 0, True) | h <- workers]))
-      >>= return . sz . snd
-  where w = length workers
-
-dist_seq :: (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
-dist_seq generators n p workers =
-    orbit (generators n) [0]
-      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 0, False) | h <- workers]))
-      >>= return . sz . snd
+      (Par (Many [(h, p, (2 * n) `div` (w * p) + 1, 0, iwp) | h <- workers]))
+      >>= return . result
   where w = length workers
 
 sz :: [MasterStats] -> String
@@ -63,14 +58,14 @@ sz (mainStats : _) =
         Nothing -> "false"
         Just s  -> "{size," ++ s ++ "}"
 
-select_par_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> Process String
-select_par_bench "True" = par
-select_par_bench "False" = par_seq
+select_par_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> Process Result
+select_par_bench "True" = par True
+select_par_bench "False" = par False
 select_par_bench _ = error "Invalid IWP Flag"
 
-select_dist_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process String
-select_dist_bench "True" = dist
-select_dist_bench "False" = dist_seq
+select_dist_bench :: String -> (Vertex -> GenClos) -> Vertex -> Int -> [NodeId] -> Process Result
+select_dist_bench "True" = dist True
+select_dist_bench "False" = dist False
 select_dist_bench _ = error "Invalid IWP Flag"
 
 bench_args :: String -> (Vertex -> GenClos, Int)

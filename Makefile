@@ -9,7 +9,7 @@ tests:
 		ghc $(COMPILE_OPTS) Tests.hs -o OrbitTests
 
 clean:
-		$(RM) *.swp *~ *.hi *.o
+		$(RM) *.swp *~ *.hi *.o *.dyn_hi *.dyn_o
 
 distclean: clean
 		$(RM) orbit OrbitTests
