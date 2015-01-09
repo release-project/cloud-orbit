@@ -39,6 +39,7 @@ Memory Profiling
   # Example: executing the 'long' benchmark
   ./orbit  +RTS -hd -p -RTS seq long 127.0.0.1 1555
   ```
+
 - Prepare the report
   ```bash
   make prof-results
