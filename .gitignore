@@ -4,5 +4,10 @@
 *.hi
 *.dyn_o
 *.dyn_hi
+*.p_o
+*.aux
+*.hp
+*.prof
+*.ps
 orbit
 OrbitTests

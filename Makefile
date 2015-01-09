@@ -8,8 +8,16 @@ orbit: FORCE
 tests:
 		ghc $(COMPILE_OPTS) Tests.hs -o OrbitTests
 
+prof: distclean
+		ghc $(COMPILE_OPTS) --make Bench.hs -main-is Bench -o orbit && \
+		ghc $(COMPILE_OPTS) --make Bench.hs -main-is Bench -o orbit -prof -osuf p_o
+
+prof-results:
+		hp2ps -e8in -c orbit && \
+		echo "The memory profiling graph is in orbit.ps"
+
 clean:
-		$(RM) *.swp *~ *.hi *.o *.dyn_hi *.dyn_o
+		$(RM) *.swp *~ *.hi *.o *.dyn_hi *.dyn_o *.p_o *.aux *.hp *.prof
 
 distclean: clean
 		$(RM) orbit OrbitTests
