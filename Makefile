@@ -1,6 +1,6 @@
 .PHONY: FORCE clean distclean
 
-COMPILE_OPTS = -Wall -rtsopts -threaded
+COMPILE_OPTS = -Wall -rtsopts -O2 -threaded
 
 orbit: FORCE
 		ghc $(COMPILE_OPTS) --make Bench.hs -main-is Bench -o orbit
