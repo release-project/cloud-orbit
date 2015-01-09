@@ -120,14 +120,16 @@ main = do
             SLN.startSlave b
         -- Invalid configuration
         _ -> do
-            putStrLn "Sequential Version"
-            putStrLn "Usage: ./orbit seq [short|intermediate|long] host port"
-            putStrLn "Paraller Version"
-            putStrLn "Usage: ./orbit par [True|False] [short|intermediate|long] nWorkers host port"
-            putStrLn "Distributed Version [Master Node]"
-            putStrLn "Usage: ./orbit dist master [True|False] [short|intermediate|long] nWorkers host port"
-            putStrLn "Distributed Version [Slave Node]"
-            putStrLn "Usage: ./orbit dist slave host port"
+            putStrLn "Usage:"
+            putStrLn "  Sequential Version"
+            putStrLn "    ./orbit seq [short|intermediate|long] host port"
+            putStrLn "  Paraller Version"
+            putStrLn "    ./orbit par [True|False] [short|intermediate|long] nWorkers host port"
+            putStrLn "  Distributed Version"
+            putStrLn "  - Master Node:"
+            putStrLn "    ./orbit dist master [True|False] [short|intermediate|long] nWorkers host port"
+            putStrLn "  - Slave Node:"
+            putStrLn "    ./orbit dist slave host port"
     where rtable :: RemoteTable
           rtable = MasterWorker.__remoteTable initRemoteTable
 
