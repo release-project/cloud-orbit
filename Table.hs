@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 --
 -- orbit-int hash table (storing vertices on a worker)
 --
@@ -50,7 +51,7 @@ is_member x i t = elem x (t ! i)
 
 -- insert(X, I, T) inserts X into table T at slot I.
 insert :: Vertex -> Int -> VTable -> VTable
-insert x i t = t // [(i, x : t ! i)]
+insert !x i t = t!i `seq` t // [(i, x : t ! i)]
 
 -- get_freq computes the fill frequency of table T;
 -- the output is a list of integers where the number at position I
