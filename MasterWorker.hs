@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell,BangPatterns #-}
 --
 -- orbit-int master (controlling orbit computation)
 --
@@ -157,7 +157,7 @@ init (localTableSize, idleTimeout, spawnImgComp) =
 -- Table: hash table holding vertices
 -- StatData: various counters and timers for gathering statistics
 vertex_server :: ParConf -> Credit -> VTable -> Ct -> Process ()
-vertex_server staticMachConf crdt table statData = do
+vertex_server staticMachConf crdt table !statData = do
     let idleTimeout = get_idle_timeout staticMachConf
     r <- receiveTimeout idleTimeout [
         match $ \("vertex", x, slot, k) -> do
