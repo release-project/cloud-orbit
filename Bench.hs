@@ -77,7 +77,7 @@ select_dist_bench "False" = dist False
 select_dist_bench _ = error "Invalid IWP Flag"
 
 bench_args :: String -> (Vertex -> GenClos, Int)
-bench_args "short" = (gg13, 10000)
+bench_args "short" = (gg13, 15000)
 bench_args "intermediate" = (gg124, 40000)
 bench_args "long" = (gg1245, 60000)
 bench_args _ = error "Invalid Version"
