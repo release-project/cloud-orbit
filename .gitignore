@@ -9,5 +9,6 @@
 *.hp
 *.prof
 *.ps
+*.eventlog
 orbit
 OrbitTests
