@@ -129,7 +129,7 @@ freq_from_stat stat =
 --------------------------------------------------------------------------------
 -- auxiliary functions
 inc :: Int -> Array Int Int -> Array Int Int
-inc i t = t // [(i, t ! i + 1)]
+inc i t = t!i `seq` t // [(i, t!i + 1)]
 
 fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral

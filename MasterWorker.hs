@@ -162,6 +162,17 @@ vertex_server staticMachConf crdt table statData = do
     r <- receiveTimeout idleTimeout [
         match $ \("vertex", x, slot, k) -> do
             -- say $ "Got a vertex!"
+            return $ Just (x, slot, k)
+      , match $ \("dump") -> do
+            return $ Nothing
+      ]
+    case r of
+        Nothing -> do let creditRetd = credit_retd statData
+                      newCreditRetd <- return_credit staticMachConf crdt creditRetd
+                      let newStatData = statData {credit_retd = newCreditRetd}
+                      vertex_server staticMachConf zero table newStatData
+        Just msg -> case msg of
+          Just (x, slot, k) -> do
             let creditPlusK = credit_atomic k crdt
                 nowTime = now
                 vertsRecvd = verts_recvd statData
@@ -179,19 +190,12 @@ vertex_server staticMachConf crdt table statData = do
                         else newStatData0 {max_idle = max maxIdle (nowTime - lastEvent)}
                 newStatData = newStatData1 {last_event = now}
             vertex_server staticMachConf newCredit newTable newStatData
-      , match $ \("dump") -> do
+          Nothing -> do
             let nowTime = now
                 lastEvent = last_event statData
                 newStatData = statData {tail_idle = nowTime - lastEvent,
                                         last_event = now}
             dump_table staticMachConf table newStatData
-      ]
-    case r of
-        Nothing -> do let creditRetd = credit_retd statData
-                      newCreditRetd <- return_credit staticMachConf crdt creditRetd
-                      let newStatData = statData {credit_retd = newCreditRetd}
-                      vertex_server staticMachConf zero table newStatData
-        Just _  -> return ()
 
 -- handle_vertex checks whether vertex X is stored in Slot of Table;
 -- if not, it is in inserted there and the images of the generators
