@@ -31,9 +31,10 @@ print_all("Master @ %s" % master)
 print_all("Slaves @ %s" % slaves)
 print_all("======================================================================")
 
-for n in range(2, len(slaves)+1, 2):
-  for iwp in iwps:
-    for vsn in versions:
+
+for iwp in iwps:
+  for vsn in versions:
+    for n in range(2, len(slaves)+1, 2):
       for core in cores:
         for rep in range(reps):
           workers = workersPerCore * core
