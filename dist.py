@@ -46,7 +46,7 @@ for iwp in iwps:
             prcs = subprocess.Popen(cmd, shell=True)
           time.sleep(2)
           t1 = time.time()
-          cmd = "./orbit +RTS -N1 -RTS dist master %s %s %s %s %s > /dev/null" % (n, iwp, vsn, workers, master["host"], master["port"])
+          cmd = "./orbit +RTS -N1 -RTS dist master %s %s %s %s %s > /dev/null" % (iwp, vsn, workers, master["host"], master["port"])
           p = subprocess.Popen(cmd, shell=True)
           p.wait()
           t2 = time.time()
