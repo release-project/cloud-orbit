@@ -48,6 +48,7 @@ for n in range(1, len(slaves)+1):
           for slv in slvs:
             cmd = "./orbit +RTS -N%s -RTS dist slave %s %s > /dev/null" % (core, slv["host"], slv["port"])
             prcs = subprocess.Popen(cmd, shell=True)
+          time.sleep(2)
           t1 = time.time()
           cmd = "./orbit +RTS -N%s -RTS dist master %s %s %s %s %s > /dev/null" % (n, iwp, vsn, workers, master["host"], master["port"])
           p = subprocess.Popen(cmd, shell=True)
