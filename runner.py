@@ -25,7 +25,7 @@ def run_dist(master, slaves, version, workers, iwp):
 reps = 2
 iwp = False
 max_cpu = 16
-versions = ["short", "intermediate", "long"]
+versions = ["short"]
 master = {"host": "127.0.0.1", "port": 5050}
 slaves = [ {"host": "127.0.0.1", "port": 5051}
          , {"host": "127.0.0.1", "port": 5052}
@@ -44,7 +44,8 @@ f = open('statistics.txt', 'w')
 for nSlaves in range(1, len(slaves)+1):
   for iwp in [False, True]:
     for vsn in versions:
-      for n in range(2, 2*max_cpu+1, 2):
+#      for n in range(2, 2*max_cpu+1, 2):
+        n = nSlaves
         slvs = slaves[0:nSlaves]
         print ("Slaves: %s, Workers: %s, Version: %s, IWP: %s" % (nSlaves, n, vsn, iwp), file=f)
         ts = []
