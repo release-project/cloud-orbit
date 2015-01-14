@@ -470,13 +470,13 @@ start_workers (Many hosts) = do
     -- say "---- In many start_workers"
     (workers, globalTableSize) <- do_start_dist hosts ([], 0)
     -- say $ "---- After do_start_dist, Workers = " ++ show workers
-    return (reverse workers, globalTableSize)
+    return (workers, globalTableSize)
 
 do_start_shm :: (Int, Int, Int, Bool) -> ([(SpawnRef, Int, Int)], Int)
                 -> Process ([(ProcessId, Int, Int)], Int)
 do_start_shm host initAcc = do
     (workers, globalTableSize) <- do_start_shm_h host initAcc
-    nWorkers <- wait_workers_shm workers []
+    nWorkers <- wait_workers workers []
     return (nWorkers, globalTableSize)
 
 do_start_shm_h :: (Int, Int, Int, Bool) -> ([(SpawnRef, Int, Int)], Int)
@@ -488,24 +488,31 @@ do_start_shm_h (m, tabSize, tmOut, spawnImgComp) (workers, gTabSize) = do
     do_start_shm_h (m - 1, tabSize, tmOut, spawnImgComp)
       ((sRef, gTabSize, tabSize) : workers, gTabSize + tabSize)
 
-wait_workers_shm :: [(SpawnRef, Int, Int)] -> [(ProcessId, Int, Int)]
+do_start_dist :: [(NodeId, Int, Int, Int, Bool)] -> ([(SpawnRef, Int, Int)], Int)
+                 -> Process ([(ProcessId, Int, Int)], Int)
+do_start_dist hosts initAcc = do
+    (workers, globalTableSize) <- do_start_dist_h hosts initAcc
+    nWorkers <- wait_workers workers []
+    return (nWorkers, globalTableSize)
+
+do_start_dist_h :: [(NodeId, Int, Int, Int, Bool)] -> ([(SpawnRef, Int, Int)], Int)
+                 -> Process ([(SpawnRef, Int, Int)], Int)
+do_start_dist_h [] acc = return acc
+do_start_dist_h ((_, 0, _, _, _) : hosts) acc = do_start_dist_h hosts acc
+do_start_dist_h ((node,m,tabSize,tmOut,spawnImgComp) : hosts) (workers,gTabSize) = do
+    sRef <- spawnAsync node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    do_start_dist_h ((node, m - 1, tabSize, tmOut, spawnImgComp) : hosts)
+      ((sRef, gTabSize, tabSize) : workers, gTabSize + tabSize)
+
+wait_workers :: [(SpawnRef, Int, Int)] -> [(ProcessId, Int, Int)]
                     -> Process [(ProcessId, Int, Int)]
-wait_workers_shm [] acc = return acc
-wait_workers_shm ((sRef, gTabSize, tabSize) : workers) acc = do
+wait_workers [] acc = return acc
+wait_workers ((sRef, gTabSize, tabSize) : workers) acc = do
     mPid <- receiveWait
         [ matchIf (\(DidSpawn ref _) -> ref == sRef)
                   (\(DidSpawn _ pid) -> return pid)
         ]
-    wait_workers_shm workers ((mPid, gTabSize, tabSize) : acc)
-
-do_start_dist :: [(NodeId, Int, Int, Int, Bool)] -> ([(ProcessId, Int, Int)], Int)
-                 -> Process ([(ProcessId, Int, Int)], Int)
-do_start_dist [] acc = return acc
-do_start_dist ((_, 0, _, _, _) : hosts) acc = do_start_dist hosts acc
-do_start_dist ((node,m,tabSize,tmOut,spawnImgComp) : hosts) (workers,gTabSize) = do
-    pid <- spawn node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
-    do_start_dist ((node, m - 1, tabSize, tmOut, spawnImgComp) : hosts)
-      ((pid, gTabSize, tabSize) : workers, gTabSize + tabSize)
+    wait_workers workers ((mPid, gTabSize, tabSize) : acc)
 
 -- collect_credit collects leftover credit from idle workers until
 -- the credit adds up to 1.
