@@ -34,7 +34,7 @@ print_all("=====================================================================
 
 for iwp in iwps:
   for vsn in versions:
-    for n in range(2, 32+1, 2):
+    for n in range(2, 42+1, 2):
       for core in cores:
         for rep in range(reps):
           time.sleep(2)
@@ -46,7 +46,7 @@ for iwp in iwps:
             prcs = subprocess.Popen(cmd, shell=True)
           time.sleep(2)
           t1 = time.time()
-          cmd = "./orbit +RTS -N%s -RTS dist master %s %s %s %s %s > /dev/null" % (n, iwp, vsn, workers, master["host"], master["port"])
+          cmd = "./orbit +RTS -N1 -RTS dist master %s %s %s %s %s > /dev/null" % (n, iwp, vsn, workers, master["host"], master["port"])
           p = subprocess.Popen(cmd, shell=True)
           p.wait()
           t2 = time.time()
