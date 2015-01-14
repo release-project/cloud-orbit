@@ -2,9 +2,18 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import sys, subprocess, time
+import sys, subprocess, time, os.path
 
-f = open('dist.log', 'a+')
+fname = 'dist.log'
+fexists = os.path.isfile(fname)
+if fexists:
+  f = open(fname, 'r')
+  ls = f.read().splitlines()
+  f.close()
+else:
+  ls = []
+
+f = open(fname, 'a+')
 def print_all(s):
   print (s, file=f)
   f.flush()
@@ -20,27 +29,31 @@ slaves = []
 for port in range(5051, 5051+64):
   slaves.append({"host": "127.0.0.1", "port": port})
 
-print_all("Parallel Orbit")
-print_all("----------------------------------------------------------------------")
-print_all("Versions: %s" % versions)
-print_all("Parallel Image Computation: %s" % iwps)
-print_all("Repetitions per Configuration: %s" % reps)
-print_all("Using Cores: %s" % cores)
-print_all("Workers Per Core: %s" % workersPerCore)
-print_all("Master @ %s" % master)
-print_all("Slaves @ %s" % slaves)
-print_all("======================================================================")
+if len(ls) == 0: 
+  print_all("Parallel Orbit")
+  print_all("----------------------------------------------------------------------")
+  print_all("Versions: %s" % versions)
+  print_all("Parallel Image Computation: %s" % iwps)
+  print_all("Repetitions per Configuration: %s" % reps)
+  print_all("Using Cores: %s" % cores)
+  print_all("Workers Per Core: %s" % workersPerCore)
+  print_all("Master @ %s" % master)
+  print_all("Slaves @ %s" % slaves)
+  print_all("======================================================================")
 
 
 for iwp in iwps:
   for vsn in versions:
-    for n in range(2, 42+1, 2):
+    for n in range(2, 60+1, 2):
       for core in cores:
         for rep in range(reps):
-          time.sleep(2)
           workers = workersPerCore * core
           slvs = slaves[0:n]
+          l = "Slaves: %s, Version: %s, IWP: %s, Cores: %s, Workers: %s, Execution: %s" % (n, vsn, iwp, core, workers, rep)
+          if l in ls:
+            continue
           print_all("Slaves: %s, Version: %s, IWP: %s, Cores: %s, Workers: %s, Execution: %s" % (n, vsn, iwp, core, workers, rep))
+          time.sleep(2)
           for slv in slvs:
             cmd = "./orbit +RTS -N%s -RTS dist slave %s %s > /dev/null" % (core, slv["host"], slv["port"])
             prcs = subprocess.Popen(cmd, shell=True)
