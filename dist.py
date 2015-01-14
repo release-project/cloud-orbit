@@ -16,15 +16,9 @@ iwps = [False, True]
 cores = [1]
 workersPerCore = 1
 master = {"host": "127.0.0.1", "port": 5050}
-slaves = [ {"host": "127.0.0.1", "port": 5051}
-         , {"host": "127.0.0.1", "port": 5052}
-         , {"host": "127.0.0.1", "port": 5053}
-         , {"host": "127.0.0.1", "port": 5054}
-         , {"host": "127.0.0.1", "port": 5055}
-         , {"host": "127.0.0.1", "port": 5056}
-         , {"host": "127.0.0.1", "port": 5057}
-         , {"host": "127.0.0.1", "port": 5058}
-         ]
+slaves = []
+for port in range(5051, 5051+16):
+  slaves.append({"host": "127.0.0.1", "port": port})
 
 print_all("Parallel Orbit")
 print_all("----------------------------------------------------------------------")
@@ -37,7 +31,7 @@ print_all("Master @ %s" % master)
 print_all("Slaves @ %s" % slaves)
 print_all("======================================================================")
 
-for n in range(1, len(slaves)+1):
+for n in range(2, len(slaves)+1, 2):
   for iwp in iwps:
     for vsn in versions:
       for core in cores:
