@@ -465,21 +465,38 @@ start_workers (JustOne host) = do
     -- say "---- In start_workers"
     (workers, globalTableSize) <- do_start_shm host ([], 0)
     -- say "---- After do_start_shm"
-    return (reverse workers, globalTableSize)
+    return (workers, globalTableSize)
 start_workers (Many hosts) = do
     -- say "---- In many start_workers"
     (workers, globalTableSize) <- do_start_dist hosts ([], 0)
     -- say $ "---- After do_start_dist, Workers = " ++ show workers
     return (reverse workers, globalTableSize)
 
-do_start_shm :: (Int, Int, Int, Bool) -> ([(ProcessId, Int, Int)], Int)
+do_start_shm :: (Int, Int, Int, Bool) -> ([(SpawnRef, Int, Int)], Int)
                 -> Process ([(ProcessId, Int, Int)], Int)
-do_start_shm (0, _, _, _) acc = return acc
-do_start_shm (m, tabSize, tmOut, spawnImgComp) (workers, gTabSize) = do
+do_start_shm host initAcc = do
+    (workers, globalTableSize) <- do_start_shm_h host initAcc
+    nWorkers <- wait_workers_shm workers []
+    return (nWorkers, globalTableSize)
+
+do_start_shm_h :: (Int, Int, Int, Bool) -> ([(SpawnRef, Int, Int)], Int)
+                -> Process ([(SpawnRef, Int, Int)], Int)
+do_start_shm_h (0, _, _, _) acc = return acc
+do_start_shm_h (m, tabSize, tmOut, spawnImgComp) (workers, gTabSize) = do
     node <- getSelfNode
-    pid <- spawn node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
-    do_start_shm (m - 1, tabSize, tmOut, spawnImgComp)
-      ((pid, gTabSize, tabSize) : workers, gTabSize + tabSize)
+    sRef <- spawnAsync node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    do_start_shm_h (m - 1, tabSize, tmOut, spawnImgComp)
+      ((sRef, gTabSize, tabSize) : workers, gTabSize + tabSize)
+
+wait_workers_shm :: [(SpawnRef, Int, Int)] -> [(ProcessId, Int, Int)]
+                    -> Process [(ProcessId, Int, Int)]
+wait_workers_shm [] acc = return acc
+wait_workers_shm ((sRef, gTabSize, tabSize) : workers) acc = do
+    mPid <- receiveWait
+        [ matchIf (\(DidSpawn ref _) -> ref == sRef)
+                  (\(DidSpawn _ pid) -> return pid)
+        ]
+    wait_workers_shm workers ((mPid, gTabSize, tabSize) : acc)
 
 do_start_dist :: [(NodeId, Int, Int, Int, Bool)] -> ([(ProcessId, Int, Int)], Int)
                  -> Process ([(ProcessId, Int, Int)], Int)
