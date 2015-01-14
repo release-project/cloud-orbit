@@ -13,7 +13,7 @@ def print_all(s):
 reps = 1
 versions = ["short", "intermediate", "long"]
 iwps = [False, True]
-cores = [1,2,4]
+cores = [1,2,4,8,16]
 workersPerCore = 1
 node = {"host": "127.0.0.1", "port": 5050}
 
