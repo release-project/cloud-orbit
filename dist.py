@@ -17,7 +17,7 @@ cores = [1]
 workersPerCore = 1
 master = {"host": "127.0.0.1", "port": 5050}
 slaves = []
-for port in range(5051, 5051+16):
+for port in range(5051, 5051+64):
   slaves.append({"host": "127.0.0.1", "port": port})
 
 print_all("Parallel Orbit")
@@ -34,9 +34,10 @@ print_all("=====================================================================
 
 for iwp in iwps:
   for vsn in versions:
-    for n in range(2, len(slaves)+1, 2):
+    for n in range(2, 32+1, 2):
       for core in cores:
         for rep in range(reps):
+          time.sleep(2)
           workers = workersPerCore * core
           slvs = slaves[0:n]
           print_all("Slaves: %s, Version: %s, IWP: %s, Cores: %s, Workers: %s, Execution: %s" % (n, vsn, iwp, core, workers, rep))
