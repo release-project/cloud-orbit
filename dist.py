@@ -46,7 +46,7 @@ for n in range(2, maxSlaves+1, step):
   slaves.append(allAvailableSlaves[0:n])
 
 if len(ls) == 0: 
-  print_all("Parallel Orbit")
+  print_all("Distributed Orbit")
   print_all("----------------------------------------------------------------------")
   print_all("Versions: %s" % versions)
   print_all("Parallel Image Computation: %s" % iwps)
