@@ -15,6 +15,14 @@ Required Haskell packages
 - [network-transport-tcp](https://hackage.haskell.org/package/network-transport-tcp)
 - [distributed-process-simplelocalnet](https://hackage.haskell.org/package/distributed-process-simplelocalnet)
 
+Building
+--------
+
+Make the executable
+```bash
+make
+```
+
 Execution
 ---------
 
