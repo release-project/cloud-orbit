@@ -43,7 +43,12 @@ new size = listArray (0, size - 1) $ cycle [[]]
 
 -- to_list(T) converts a table T into a list of its entries.
 to_list :: VTable -> [Vertex]
-to_list = concat . elems
+to_list arr = concat' (elems arr) []
+
+concat' :: [[Vertex]] -> [Vertex] -> [Vertex]
+concat' [] acc = acc
+concat' ((h:t):t') acc = concat' (t:t') (h:acc)
+concat' (([]):t) acc = concat' t acc
 
 -- is_member(X, I, T) is true iff X is stored in table T at slot I.
 is_member :: Vertex -> Int -> VTable -> Bool
