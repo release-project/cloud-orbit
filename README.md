@@ -35,6 +35,28 @@ Execution
   ./orbit +RTS -N4 -RTS par True long 4 127.0.0.1 1555
   ```
 
+- Distributed Orbit
+
+  First, start the worker nodes.
+  ```bash
+  # Run for every worker node
+  ./orbit dist slave host port
+  
+  # Example: run a worker node on 4 cores
+  ./orbit +RTS -N4 -RTS dist slave 127.0.0.1 1554
+  ```
+  
+  Once all the workers nodes have been deployed on the local network,
+  start the master node.
+  ```bash
+  ./orbit dist master True|False short|intermediate|long nWorkers host port
+  
+  # Example: executing the 'long' benchmark without parallel image
+  # computations, using 4 workers on each node and the master node
+  # running on 2 cores
+  ./orbit +RTS -N2 -RTS dist master long 4 127.0.0.1 1555
+  ```
+
 Memory Profiling
 ----------------
 
