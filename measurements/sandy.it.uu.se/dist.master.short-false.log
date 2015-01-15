@@ -1,0 +1,42 @@
+Distributed Orbit
+----------------------------------------------------------------------
+Versions: ['short']
+Parallel Image Computation: [False]
+Repetitions per Configuration: 1
+Using Cores: [1]
+Workers Per Core: 1
+Master @ {'host': '127.0.0.1', 'port': 5050}
+Slaves @ [2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 58, 62]
+======================================================================
+Slaves: 2, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  6.89764690399 sec(s)
+Slaves: 6, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.66537880898 sec(s)
+Slaves: 10, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.28932714462 sec(s)
+Slaves: 14, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.24875879288 sec(s)
+Slaves: 18, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.32827591896 sec(s)
+Slaves: 22, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.25751399994 sec(s)
+Slaves: 26, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  21.7783739567 sec(s)
+Slaves: 30, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  20.0078060627 sec(s)
+Slaves: 34, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.55296707153 sec(s)
+Slaves: 38, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.50596308708 sec(s)
+Slaves: 42, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  15.606965065 sec(s)
+Slaves: 46, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  15.0154891014 sec(s)
+Slaves: 50, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  13.314661026 sec(s)
+Slaves: 54, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  14.057446003 sec(s)
+Slaves: 58, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.75240397453 sec(s)
+Slaves: 62, Version: short, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  13.2803030014 sec(s)

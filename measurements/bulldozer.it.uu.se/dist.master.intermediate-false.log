@@ -1,0 +1,42 @@
+Distributed Orbit
+----------------------------------------------------------------------
+Versions: ['intermediate']
+Parallel Image Computation: [False]
+Repetitions per Configuration: 1
+Using Cores: [1]
+Workers Per Core: 1
+Master @ {'host': '127.0.0.1', 'port': 5050}
+Slaves @ [2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 58, 62]
+======================================================================
+Slaves: 2, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  26.73199296 sec(s)
+Slaves: 6, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  7.72572517395 sec(s)
+Slaves: 10, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  90.2688539028 sec(s)
+Slaves: 14, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  5.21275496483 sec(s)
+Slaves: 18, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.96986985207 sec(s)
+Slaves: 22, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  6.22052311897 sec(s)
+Slaves: 26, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.72075200081 sec(s)
+Slaves: 30, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  37.7388811111 sec(s)
+Slaves: 34, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.79665017128 sec(s)
+Slaves: 38, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  38.7537698746 sec(s)
+Slaves: 42, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  28.5875611305 sec(s)
+Slaves: 46, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  285.859812975 sec(s)
+Slaves: 50, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  4.92136192322 sec(s)
+Slaves: 54, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  22.8042089939 sec(s)
+Slaves: 58, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  5.1557700634 sec(s)
+Slaves: 62, Version: intermediate, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  231.674054861 sec(s)
