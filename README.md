@@ -34,7 +34,7 @@ Memory Profiling
   make prof
   ```
 
-- Run the proper RTS options
+- Run with the proper RTS options
   ```bash
   # Example: executing the 'long' benchmark
   ./orbit  +RTS -hd -p -RTS seq long 127.0.0.1 1555
@@ -43,6 +43,24 @@ Memory Profiling
 - Prepare the report
   ```bash
   make prof-results
+  ```
+
+Profiling with Threadscope
+--------------------------
+
+- Compile with enabled event logging
+  ```bash
+  make threadscope
+  ```
+
+- Run with the proper RTS options
+  ```bash
+  # Example: executing the 'long' benchmark
+  ./orbit +RTS -ls -RTS seq long 127.0.0.1 1555
+  ```
+- Open the report with threadscope
+  ```bash
+  threadscope orbit.eventlog
   ```
 
 Credits
