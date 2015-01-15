@@ -82,6 +82,30 @@ Python 2.x is needed in order to run the scripts.
   node = {"host": "127.0.0.1", "port": 5050}
   ```
 
+- Parallel Orbit
+  ```bash
+  python par.py
+  ```
+  
+  Variables that can be tweaked with their default values.
+  ```python
+  # Path to the file that will hold the results.
+  fname = 'par.log'
+  # Number of repetitions per configuration.
+  reps = 1
+  # List of versions.
+  versions = ["short", "intermediate", "long"]
+  # Perform parallel image computations
+  iwps = [False, True]
+  # No of cores used
+  cores = [1,2,4,8,16]
+  # Ratio of No of workers to No of cores.
+  workersPerCore = 1
+  # Host information.
+  node = {"host": "127.0.0.1", "port": 5050}
+  
+  ```
+
 Memory Profiling
 ----------------
 

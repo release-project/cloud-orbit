@@ -4,17 +4,25 @@
 from __future__ import print_function
 import sys, subprocess, time
 
-f = open('par.log', 'a+')
+# Path to the file that will hold the results.
+fname = 'par.log'
+f = open(fname, 'a+')
 def print_all(s):
   print (s, file=f)
   f.flush()
   print (s, file=sys.stdout)
 
+# Number of repetitions per configuration.
 reps = 1
+# List of versions.
 versions = ["short", "intermediate", "long"]
+# Perform parallel image computations
 iwps = [False, True]
+# No of cores used
 cores = [1,2,4,8,16]
+# Ratio of No of workers to No of cores.
 workersPerCore = 1
+# Host information.
 node = {"host": "127.0.0.1", "port": 5050}
 
 print_all("Parallel Orbit")
