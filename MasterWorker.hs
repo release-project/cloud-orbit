@@ -229,8 +229,10 @@ dump_table :: ParConf -> VTable -> Ct -> Process ()
 dump_table staticMachConf table statData = do
     nodeId <- getSelfNode
     let masterPid = get_master staticMachConf
-        stat = worker_stats nodeId (get_freq table) statData
-    send masterPid ("result", to_list table, stat)
+        freq_tbl = get_freq table
+        lst = to_list table
+    stat <- worker_stats nodeId freq_tbl statData
+    send masterPid ("result", lst, stat)
 
 -- distribute_images distributes the images of vertex X under the generators
 -- to the workers determined by the hash; some ore all of of the Credit is
@@ -315,16 +317,19 @@ global_to_local_slot ((pid, _, tabSize) : workers) globSlot
 -- auxiliary functions
 
 -- produce readable statistics
-worker_stats :: NodeId -> Freq -> Ct -> WorkerStats
-worker_stats node frequency statData =
-      ("node", show node)
-    : ("vertices_recvd", show $ verts_recvd statData)
-    : ("credit_retd", show $ credit_retd statData)
-    : ("min_atomic_credit", show $ min_atomic_credit statData)
-    : ("init_idle_time", show $ init_idle statData)
-    : ("max_idle_time", show $ max_idle statData)
-    : ("tail_idle_time", show $ tail_idle statData)
-    : freq_to_stat frequency
+worker_stats :: NodeId -> Freq -> Ct -> Process WorkerStats
+worker_stats node frequency statData = do
+    let frq = freq_to_stat frequency
+    return $ frq `seq` (
+          ("node", show node)
+        : ("vertices_recvd", show $ verts_recvd statData)
+        : ("credit_retd", show $ credit_retd statData)
+        : ("min_atomic_credit", show $ min_atomic_credit statData)
+        : ("init_idle_time", show $ init_idle statData)
+        : ("max_idle_time", show $ max_idle statData)
+        : ("tail_idle_time", show $ tail_idle statData)
+        : frq
+      )
 
 verts_recvd_from_stat :: WorkerStats -> Int
 verts_recvd_from_stat stat =
