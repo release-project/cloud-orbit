@@ -478,6 +478,7 @@ do_start_shm (0, _, _, _) acc = return acc
 do_start_shm (m, tabSize, tmOut, spawnImgComp) (workers, gTabSize) = do
     node <- getSelfNode
     pid <- spawn node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    reconnect pid
     do_start_shm (m - 1, tabSize, tmOut, spawnImgComp)
       ((pid, gTabSize, tabSize) : workers, gTabSize + tabSize)
 
@@ -487,6 +488,7 @@ do_start_dist [] acc = return acc
 do_start_dist ((_, 0, _, _, _) : hosts) acc = do_start_dist hosts acc
 do_start_dist ((node,m,tabSize,tmOut,spawnImgComp) : hosts) (workers,gTabSize) = do
     pid <- spawn node ($(mkClosure 'init) (tabSize, tmOut, spawnImgComp))
+    reconnect pid
     do_start_dist ((node, m - 1, tabSize, tmOut, spawnImgComp) : hosts)
       ((pid, gTabSize, tabSize) : workers, gTabSize + tabSize)
 
