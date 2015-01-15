@@ -57,6 +57,31 @@ Execution
   ./orbit +RTS -N2 -RTS dist master long 4 127.0.0.1 1555
   ```
 
+Scripts for automated execution
+-------------------------------
+
+We have created some Python scripts to automatically run sample configurations of the sequential, parallel and distributed Orbit.
+
+Python 2.x is needed in order to run the scripts.
+
+- Sequential Orbit
+  ```bash
+  python seq.py
+  
+  ```
+  
+  Variables that can be tweaked with their default values.
+  ```python
+  # Path to the file that will hold the results.
+  fname = 'seq.log'
+  # Number of repetitions per configuration.
+  reps = 1
+  # List of versions.
+  versions = ["short", "intermediate", "long"]
+  # Host information.
+  node = {"host": "127.0.0.1", "port": 5050}
+  ```
+
 Memory Profiling
 ----------------
 

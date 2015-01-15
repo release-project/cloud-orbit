@@ -4,14 +4,19 @@
 from __future__ import print_function
 import sys, subprocess, time
 
-f = open('seq.log', 'a+')
+# Path to the file that will hold the results.
+fname = 'seq.log'
+f = open(fname, 'a+')
 def print_all(s):
   print (s, file=f)
   f.flush()
   print (s, file=sys.stdout)
 
+# Number of repetitions per configuration.
 reps = 1
+# List of versions.
 versions = ["short", "intermediate", "long"]
+# Host information.
 node = {"host": "127.0.0.1", "port": 5050}
 
 print_all("Sequential Orbit")
