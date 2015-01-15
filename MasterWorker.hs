@@ -182,13 +182,16 @@ vertex_server staticMachConf crdt table !statData = do
                 maxIdle = max_idle statData
             (newCredit, newTable) <-
                 handle_vertex staticMachConf x slot creditPlusK table
-            let newStatData0 = statData {verts_recvd = vertsRecvd + 1,
+            let newStatData0 = minAtomicCredit `seq`
+                               statData {verts_recvd = vertsRecvd + 1,
                                          min_atomic_credit = max minAtomicCredit k}
                 newStatData1 =
+                    min_atomic_credit newStatData0 `seq`
                     if initIdle < 0
                         then newStatData0 {init_idle = nowTime - lastEvent}
                         else newStatData0 {max_idle = max maxIdle (nowTime - lastEvent)}
-                newStatData = newStatData1 {last_event = now}
+                newStatData = max_idle newStatData1 `seq`
+                              newStatData1 {last_event = now}
             vertex_server staticMachConf newCredit newTable newStatData
           Nothing -> do
             let nowTime = now
@@ -231,7 +234,7 @@ dump_table staticMachConf table statData = do
     let masterPid = get_master staticMachConf
         freq_tbl = get_freq table
         lst = to_list table
-    stat <- worker_stats nodeId freq_tbl statData
+        stat = worker_stats nodeId freq_tbl statData
     send masterPid ("result", lst, stat)
 
 -- distribute_images distributes the images of vertex X under the generators
@@ -317,19 +320,16 @@ global_to_local_slot ((pid, _, tabSize) : workers) globSlot
 -- auxiliary functions
 
 -- produce readable statistics
-worker_stats :: NodeId -> Freq -> Ct -> Process WorkerStats
+worker_stats :: NodeId -> Freq -> Ct -> WorkerStats
 worker_stats node frequency statData = do
-    let frq = freq_to_stat frequency
-    return $ frq `seq` (
-          ("node", show node)
-        : ("vertices_recvd", show $ verts_recvd statData)
-        : ("credit_retd", show $ credit_retd statData)
-        : ("min_atomic_credit", show $ min_atomic_credit statData)
-        : ("init_idle_time", show $ init_idle statData)
-        : ("max_idle_time", show $ max_idle statData)
-        : ("tail_idle_time", show $ tail_idle statData)
-        : frq
-      )
+      ("node", show node)
+    : ("vertices_recvd", show $ verts_recvd statData)
+    : ("credit_retd", show $ credit_retd statData)
+    : ("min_atomic_credit", show $ min_atomic_credit statData)
+    : ("init_idle_time", show $ init_idle statData)
+    : ("max_idle_time", show $ max_idle statData)
+    : ("tail_idle_time", show $ tail_idle statData)
+    : freq_to_stat frequency
 
 verts_recvd_from_stat :: WorkerStats -> Int
 verts_recvd_from_stat stat =
