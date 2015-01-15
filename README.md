@@ -26,6 +26,15 @@ Execution
   ./orbit seq long 127.0.0.1 1555
   ```
 
+- Parallel Orbit
+  ```bash
+  ./orbit par True|False short|intermediate|long nWorkers host port
+  
+  # Example: executing the 'long' benchmark with parallel image
+  # computations using 4 workers on 4 cores
+  ./orbit +RTS -N4 -RTS par True long 4 127.0.0.1 1555
+  ```
+
 Memory Profiling
 ----------------
 
@@ -58,6 +67,7 @@ Profiling with Threadscope
   # Example: executing the 'long' benchmark
   ./orbit +RTS -ls -RTS seq long 127.0.0.1 1555
   ```
+
 - Open the report with threadscope
   ```bash
   threadscope orbit.eventlog
