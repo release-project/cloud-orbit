@@ -106,6 +106,35 @@ Python 2.x is needed in order to run the scripts.
   
   ```
 
+- Distributed Orbit
+  ```bash
+  python dist.py
+  ```
+  
+  Variables that can be tweaked with their default values.
+  ```python
+  # Path to the file that will hold the results.
+  fname = 'dist.log'
+  # Number of repetitions per configuration.
+  reps = 1
+  # List of versions.
+  versions = ["short", "intermediate", "long"]
+  # Perform parallel image computations.
+  iwps = [False, True]
+  # No of cores used by each worker node.
+  cores = [1]
+  # Ratio of No of workers to No of cores in each worker node.
+  workersPerCore = 1
+  # Master node information
+  master = {"host": "127.0.0.1", "port": 5050}
+  # Maximum number of workers nodes
+  maxSlaves = 60
+  # No of workers nodes to add after each iteration
+  step = 2
+  # Port of the 1st worker node (Assume that the host will be localhost).
+  workerPort = 5051
+  ```
+
 Memory Profiling
 ----------------
 
