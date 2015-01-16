@@ -36,6 +36,7 @@ import           Table
 import           Utils                                      (GenClos (..),
                                                              Generator,
                                                              now)
+import Control.DeepSeq (deepseq)
 
 -- counters/timers record
 data Ct = Ct { verts_recvd :: Int    -- #vertices received by this server so far
@@ -162,6 +163,7 @@ vertex_server staticMachConf crdt table !statData = do
     r <- receiveTimeout idleTimeout [
         match $ \("vertex", x, slot, k) -> do
             -- say $ "Got a vertex!"
+            liftIO $ putStrLn $ "Got a vertex! " ++ (show x)
             return $ Just (x, slot, k)
       , match $ \("dump") -> do
             return $ Nothing
