@@ -42,7 +42,7 @@ allAvailableSlaves = []
 for port in range(workerPort, workerPort+maxSlaves):
   allAvailableSlaves.append({"host": "127.0.0.1", "port": port})
 slaves = []
-for n in [1] + range(2, maxSlaves+1, step):
+for n in range(2, maxSlaves+1, step):
   slaves.append(allAvailableSlaves[0:n])
 
 if len(ls) == 0: 
@@ -71,11 +71,11 @@ for iwp in iwps:
           print_all("Slaves: %s, Version: %s, IWP: %s, Cores: %s, Workers: %s, Execution: %s" % (n, vsn, iwp, core, workers, rep))
           time.sleep(2)
           for slv in slvs:
-            cmd = "./orbit +RTS -N%s -RTS dist slave %s %s > /dev/null" % (core, slv["host"], slv["port"])
+            cmd = "./orbit +RTS -N%s -RTS dist slave %s %s" % (core, slv["host"], slv["port"])
             prcs = subprocess.Popen(cmd, shell=True)
           time.sleep(2)
           t1 = time.time()
-          cmd = "./orbit +RTS -N1 -RTS dist master %s %s %s %s %s > /dev/null" % (iwp, vsn, workers, master["host"], master["port"])
+          cmd = "./orbit +RTS -N1 -RTS dist master %s %s %s %s %s" % (iwp, vsn, workers, master["host"], master["port"])
           p = subprocess.Popen(cmd, shell=True)
           p.wait()
           t2 = time.time()
