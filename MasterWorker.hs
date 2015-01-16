@@ -36,7 +36,6 @@ import           Table
 import           Utils                                      (GenClos (..),
                                                              Generator,
                                                              now)
-import Control.DeepSeq (deepseq)
 
 -- counters/timers record
 data Ct = Ct { verts_recvd :: Int    -- #vertices received by this server so far
