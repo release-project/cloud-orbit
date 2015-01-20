@@ -1,0 +1,8 @@
+Sequential Orbit
+----------------------------------------------------------------------
+Versions: ['short', 'intermediate', 'long']
+Repetitions per Configuration: 1
+Node @ {'host': '127.0.0.1', 'port': 5050}
+======================================================================
+Version: long, Execution: 0
+  320.590447903 sec(s)
