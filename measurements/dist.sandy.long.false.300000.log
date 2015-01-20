@@ -1,0 +1,196 @@
+Distributed Orbit
+----------------------------------------------------------------------
+Versions: ['long']
+Parallel Image Computation: [False]
+Repetitions per Configuration: 3
+Using Cores: [1]
+Workers Per Core: 1
+Master @ {'host': '127.0.0.1', 'port': 5050}
+Slaves @ [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62]
+======================================================================
+Slaves: 2, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  597.349395037 sec(s)
+Slaves: 2, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  603.624737024 sec(s)
+Slaves: 2, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  607.609728098 sec(s)
+Slaves: 4, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  191.143162966 sec(s)
+Slaves: 4, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  196.93321085 sec(s)
+Slaves: 4, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  194.712863922 sec(s)
+Slaves: 6, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  120.180399179 sec(s)
+Slaves: 6, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  120.625418186 sec(s)
+Slaves: 6, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  121.653151035 sec(s)
+Slaves: 8, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  84.9329941273 sec(s)
+Slaves: 8, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  76.4773459435 sec(s)
+Slaves: 8, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  81.1368660927 sec(s)
+Slaves: 10, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  62.1222600937 sec(s)
+Slaves: 10, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  61.5676419735 sec(s)
+Slaves: 10, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  63.6330490112 sec(s)
+Slaves: 12, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  51.9107980728 sec(s)
+Slaves: 12, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  51.0280358791 sec(s)
+Slaves: 12, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  55.2566330433 sec(s)
+Slaves: 14, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  42.3092429638 sec(s)
+Slaves: 14, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  46.5070300102 sec(s)
+Slaves: 14, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  45.7711348534 sec(s)
+Slaves: 16, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  41.9023029804 sec(s)
+Slaves: 16, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  49.3163518906 sec(s)
+Slaves: 16, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  50.8843998909 sec(s)
+Slaves: 18, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  41.0554120541 sec(s)
+Slaves: 18, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  41.9161379337 sec(s)
+Slaves: 18, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  45.6873450279 sec(s)
+Slaves: 20, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  40.1410868168 sec(s)
+Slaves: 20, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  47.8100960255 sec(s)
+Slaves: 20, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  44.2882180214 sec(s)
+Slaves: 22, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  37.3057639599 sec(s)
+Slaves: 22, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  36.6008310318 sec(s)
+Slaves: 22, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  46.0049328804 sec(s)
+Slaves: 24, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  43.8433148861 sec(s)
+Slaves: 24, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  35.3863201141 sec(s)
+Slaves: 24, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  39.2383589745 sec(s)
+Slaves: 26, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  50.5253388882 sec(s)
+Slaves: 26, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  44.8441309929 sec(s)
+Slaves: 26, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  42.2446329594 sec(s)
+Slaves: 28, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  40.7352609634 sec(s)
+Slaves: 28, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  40.2704291344 sec(s)
+Slaves: 28, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  37.7011749744 sec(s)
+Slaves: 30, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  43.0511360168 sec(s)
+Slaves: 30, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  46.1459100246 sec(s)
+Slaves: 30, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  38.7973179817 sec(s)
+Slaves: 32, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  50.524657011 sec(s)
+Slaves: 32, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  41.2524118423 sec(s)
+Slaves: 32, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  52.4360609055 sec(s)
+Slaves: 34, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  51.7706599236 sec(s)
+Slaves: 34, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  43.8394780159 sec(s)
+Slaves: 34, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  46.6340630054 sec(s)
+Slaves: 36, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  47.8902199268 sec(s)
+Slaves: 36, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  57.4054629803 sec(s)
+Slaves: 36, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  56.6576561928 sec(s)
+Slaves: 38, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  54.0536618233 sec(s)
+Slaves: 38, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  55.2238650322 sec(s)
+Slaves: 38, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  52.4808018208 sec(s)
+Slaves: 40, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  55.3385739326 sec(s)
+Slaves: 40, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  52.4782440662 sec(s)
+Slaves: 40, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  53.735722065 sec(s)
+Slaves: 42, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  63.8219330311 sec(s)
+Slaves: 42, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  59.5200998783 sec(s)
+Slaves: 42, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  55.4492878914 sec(s)
+Slaves: 44, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  56.8296029568 sec(s)
+Slaves: 44, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  54.925577879 sec(s)
+Slaves: 44, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  59.2406899929 sec(s)
+Slaves: 46, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  57.8374791145 sec(s)
+Slaves: 46, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  50.3464829922 sec(s)
+Slaves: 46, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  67.3894040585 sec(s)
+Slaves: 48, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  55.5368421078 sec(s)
+Slaves: 48, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  54.4644908905 sec(s)
+Slaves: 48, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  62.0561401844 sec(s)
+Slaves: 50, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  56.1319689751 sec(s)
+Slaves: 50, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  57.7978022099 sec(s)
+Slaves: 50, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  55.9502279758 sec(s)
+Slaves: 52, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  69.5293159485 sec(s)
+Slaves: 52, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  55.4649620056 sec(s)
+Slaves: 52, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  78.4481930733 sec(s)
+Slaves: 54, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  77.9087891579 sec(s)
+Slaves: 54, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  80.1360931396 sec(s)
+Slaves: 54, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  84.6925840378 sec(s)
+Slaves: 56, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  91.6648600101 sec(s)
+Slaves: 56, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  78.6633579731 sec(s)
+Slaves: 56, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  88.7614700794 sec(s)
+Slaves: 58, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  78.2182831764 sec(s)
+Slaves: 58, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  89.3138589859 sec(s)
+Slaves: 58, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  81.8917160034 sec(s)
+Slaves: 60, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  88.7200770378 sec(s)
+Slaves: 60, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  100.535962105 sec(s)
+Slaves: 60, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  99.6664760113 sec(s)
+Slaves: 62, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 0
+  94.928841114 sec(s)
+Slaves: 62, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 1
+  97.0699870586 sec(s)
+Slaves: 62, Version: long, IWP: False, Cores: 1, Workers: 1, Execution: 2
+  92.006414175 sec(s)
